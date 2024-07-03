@@ -1,6 +1,7 @@
 ﻿using AppFinanzasWeb.Models;
 using AppFinanzasWeb.Servicios;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection.Metadata.Ecma335;
 
 namespace AppFinanzasWeb.Controllers
 {
@@ -16,6 +17,77 @@ namespace AppFinanzasWeb.Controllers
         {
             var cuentas = await repositorioCuentas.Obtener();
             return View(cuentas);
+        }
+
+        public IActionResult Crear()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Crear(Cuenta cuenta)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(cuenta);
+            }
+            //continuo con el crear mientras
+            await repositorioCuentas.Crear(cuenta);
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Editar(int Id)
+        {
+            var cuenta = await repositorioCuentas.ObtenerPorId(Id);
+
+            if (cuenta is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            return View(cuenta);
+        }
+
+        [HttpPost]
+
+        public async Task<IActionResult> Editar(Cuenta cuenta)
+        {
+            var cuentaExiste = await repositorioCuentas.ObtenerPorId(cuenta.Id);
+
+            if (cuentaExiste is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            await repositorioCuentas.Actualizar(cuenta);
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Borrar(int id)
+        {
+            var cuenta = await repositorioCuentas.ObtenerPorId(id);
+
+            if (cuenta is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            return View(cuenta);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BorrarCuenta(int id)
+        {
+            var cuenta = await repositorioCuentas.ObtenerPorId(id);
+
+            if (cuenta is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            await repositorioCuentas.Borrar(id);
+            return RedirectToAction("Index");
         }
     }
 }

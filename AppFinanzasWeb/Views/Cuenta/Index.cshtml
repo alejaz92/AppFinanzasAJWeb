@@ -4,6 +4,11 @@
 }
 
 <h1>Cuentas</h1>
+
+<a asp-action="Crear" class="btn btn-primary mb-3">
+    Agregar Cuenta
+</a>
+
 <table class="table">
     <thead>
         <tr>
@@ -19,7 +24,9 @@
                     @cuenta.Nombre                    
                 </td>
                 <td>
-                    <input type="hidden" value="@cuenta.Id " />
+                    <input type="hidden" value="@cuenta.Id " class="ids"/>
+                    <a class="btn btn-primary" asp-action="Editar" asp-route-id="@cuenta.Id">Editar</a>
+                    <a class="btn btn-danger" asp-action="Borrar" asp-route-id="@cuenta.Id">Eliminar</a>
                 </td>
             </tr>
         }

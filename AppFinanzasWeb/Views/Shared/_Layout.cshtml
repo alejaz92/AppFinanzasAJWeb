@@ -3,7 +3,15 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - AppFinanzasWeb</title>
+ @*    <title>@ViewData["Title"] - AppFinanzasWeb</title>
+    <style>
+        /* CSS para mostrar el menú desplegable al pasar el puntero */
+        .dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0; /* Permite que el menú se muestre justo debajo del enlace */
+        }
+    </style> *@
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/AppFinanzasWeb.styles.css" asp-append-version="true" />
@@ -22,8 +30,16 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle">Gestión</a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" asp-controller="Cuenta" asp-action="Index">
+                                    Cuentas
+                                </a>
+                                <a class="dropdown-item" asp-controller="Tarjeta" asp-action="Index">
+                                    Tarjetas
+                                </a>
+                            </div>
                         </li>
                     </ul>
                 </div>
