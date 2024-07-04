@@ -1,0 +1,52 @@
+﻿@model IEnumerable<Activo>
+@{
+    ViewData["Title"] = "Activos";
+    ViewBag.Title = "Activos";
+}
+
+<h1>Activos</h1>
+
+
+<form method="get" asp-controller="Activo" asp-action="Index" id="filterForm"> 
+    <label for="Id">Tipo de Activo</label>
+    <select id="Id" class="form-select mb-3" name="Id" asp-items="ViewBag.TiposActivos" onchange="document.getElementById('filterForm').submit();">
+        <option value="">Selecciona un tipo</option>
+    </select>
+</form>
+
+
+@if (Model.Any()) 
+{
+    <a asp-action="Crear" asp-route-id="@ViewBag.SelectedIdTipoActivo" class="btn btn-primary mb-3">
+        Agregar Activo
+    </a>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Símbolo</th>
+                <th>Nombre</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var activo in Model)
+            {
+                <tr>
+                    <td>
+                        @activo.SIMBOLO
+                    </td>
+                    <td>
+                        @activo.Nombre
+                    </td>
+                    <td>
+                        <input type="hidden" value="@activo.Id " class="ids" />
+                        <a class="btn btn-primary" asp-action="Editar" asp-route-id="@activo.Id">Editar</a>
+                        <a class="btn btn-danger" asp-action="Borrar" asp-route-id="@activo.Id">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+

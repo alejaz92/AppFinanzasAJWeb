@@ -37,6 +37,19 @@ namespace AppFinanzasWeb.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> VerificarExisteCuenta(string nombre)
+        {
+            var yaExisteCuenta = await repositorioCuentas.Existe(nombre);
+
+            if (yaExisteCuenta)
+            {
+                return Json($"El nombre {nombre} ya existe");
+            }
+
+            return Json(true);
+        }
+
+        [HttpGet]
         public async Task<ActionResult> Editar(int Id)
         {
             var cuenta = await repositorioCuentas.ObtenerPorId(Id);
@@ -58,6 +71,11 @@ namespace AppFinanzasWeb.Controllers
             if (cuentaExiste is null)
             {
                 return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(cuenta);
             }
 
             await repositorioCuentas.Actualizar(cuenta);

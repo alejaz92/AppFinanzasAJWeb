@@ -31,7 +31,7 @@ namespace AppFinanzasWeb.Controllers
             {
                 return View(tarjeta);
             }
-            //continuo con el crear mientras
+            
             await repositorioTarjetas.Crear(tarjeta);
             return RedirectToAction("Index");
         }
@@ -44,6 +44,11 @@ namespace AppFinanzasWeb.Controllers
             if (tarjeta is null)
             {
                 return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(tarjeta);
             }
 
             return View(tarjeta);
@@ -88,6 +93,19 @@ namespace AppFinanzasWeb.Controllers
 
             await repositorioTarjetas.Borrar(id);
             return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> VerificarExisteTarjeta(string nombre)
+        {
+            var yaExisteCuenta = await repositorioTarjetas.Existe(nombre);
+
+            if (yaExisteCuenta)
+            {
+                return Json($"El nombre {nombre} ya existe");
+            }
+
+            return Json(true);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ManejoPresupuesto.Validaciones;
+using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace AppFinanzasWeb.Models
 {
@@ -8,6 +10,8 @@ namespace AppFinanzasWeb.Models
 
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [StringLength(maximumLength:60)]
+        [PrimeraLetraMayuscula]
+        [Remote(action: "VerificarExisteTarjeta", controller: "Tarjeta")]
         public string Nombre { get; set; }
     }
 }

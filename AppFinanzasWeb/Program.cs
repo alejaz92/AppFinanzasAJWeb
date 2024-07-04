@@ -3,9 +3,14 @@ using AppFinanzasWeb.Servicios;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IRepositorioCuentas, RepositorioCuentas>();
 builder.Services.AddTransient<IRepositorioTarjetas, RepositorioTarjetas>();
+builder.Services.AddTransient<IRepositorioTiposActivo, RepositorioTiposActivo>();
+builder.Services.AddTransient<IRepositorioActivos, RepositorioActivos>();
+
+
 
 var app = builder.Build();
 

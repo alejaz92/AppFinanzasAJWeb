@@ -11,6 +11,8 @@ namespace AppFinanzasWeb.Servicios
         Task<Cuenta> ObtenerPorId(int id);
         Task Actualizar(Cuenta cuenta);
         Task Borrar(int id);
+        Task<bool> Existe(string nombre);
+
     }
     public class RepositorioCuentas: IRepositorioCuentas
     {
@@ -57,6 +59,17 @@ namespace AppFinanzasWeb.Servicios
         {
             using var connection = new SqlConnection( connectionString);
             await connection.ExecuteAsync("DELETE FROM Dim_Cuenta WHERE idCuenta = @Id", new { id });
+        }
+
+        public async Task<bool> Existe(string nombre)
+        {
+            using var connection = new SqlConnection(connectionString);
+            var existe = await connection.QueryFirstOrDefaultAsync<int>(
+                                    @"SELECT 1
+                                    FROM Dim_Cuenta
+                                    WHERE Nombre = @Nombre;",
+                                    new { nombre });
+            return existe == 1;
         }
     }
 }

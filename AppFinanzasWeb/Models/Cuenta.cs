@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ManejoPresupuesto.Validaciones;
+using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace AppFinanzasWeb.Models
 {
@@ -7,6 +9,8 @@ namespace AppFinanzasWeb.Models
         public int Id { get; set; }
         [Required(ErrorMessage = "El campo {0} es requerido")]
         [StringLength(maximumLength:50)]
+        [PrimeraLetraMayuscula]
+        [Remote(action: "VerificarExisteCuenta", controller: "Cuenta")]
         public string Nombre { get; set; }  
     }
 }

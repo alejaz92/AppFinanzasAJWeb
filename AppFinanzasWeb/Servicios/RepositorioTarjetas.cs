@@ -11,6 +11,7 @@ namespace AppFinanzasWeb.Servicios
         Task<Tarjeta> ObtenerPorId(int id);
         Task Actualizar(Tarjeta tarjeta);
         Task Borrar(int id);
+        Task<bool> Existe(string nombre);
     }
     public class RepositorioTarjetas : IRepositorioTarjetas
     {
@@ -56,6 +57,17 @@ namespace AppFinanzasWeb.Servicios
         {
             using var connection = new SqlConnection(connectionString);
             await connection.ExecuteAsync("DELETE FROM Dim_Tarjeta WHERE idTarjeta = @Id", new { id });
+        }
+
+        public async Task<bool> Existe(string nombre)
+        {
+            using var connection = new SqlConnection(connectionString);
+            var existe = await connection.QueryFirstOrDefaultAsync<int>(
+                                    @"SELECT 1
+                                    FROM Dim_Tarjeta
+                                    WHERE Nombre = @Nombre;",
+                                    new { nombre });
+            return existe == 1;
         }
     }
 }
