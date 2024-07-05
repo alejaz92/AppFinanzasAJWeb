@@ -6,6 +6,5 @@ namespace AppFinanzasWeb.ViewModels
     {
         public Activo Activo { get; set; }
         public string TipoActivoNombre { get; set; }
-        public int TipoActivoID { get; set; }
     }
 }

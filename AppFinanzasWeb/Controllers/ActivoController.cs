@@ -52,12 +52,55 @@ namespace AppFinanzasWeb.Controllers
                     IDTIPOACTIVO = tipoActivo.Id
                 },
                 TipoActivoNombre = tipoActivo.Nombre
-
+                
+                
 
 
             };
 
-            return View(tipoActivo);
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Crear(ActivoCrearViewModel vmActivo)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(vmActivo);
+            }
+
+            await repositorioActivos.Crear(vmActivo.Activo);
+            return RedirectToAction(nameof(Index), new {Id = vmActivo.Activo.IDTIPOACTIVO});
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Editar(int Id)
+        {
+            var activo = await repositorioActivos.ObtenerPorId(Id);
+            if (activo is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+            return View(activo);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Editar(Activo activo)
+        {
+            var activoExiste = await repositorioActivos.ObtenerPorId(activo.Id);
+            if (activoExiste is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(activo);
+            }
+
+            await repositorioActivos.Actualizar(activo);
+            return RedirectToAction(nameof(Index), new { Id = activoExiste.IDTIPOACTIVO });
         }
     }
 }

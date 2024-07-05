@@ -1,19 +1,30 @@
-﻿@model Activo
+﻿@model AppFinanzasWeb.ViewModels.ActivoCrearViewModel
 @{
     ViewData["Title"] = "Crear Activo";
 }
 
-<h1>Crear Activo</h1>
+<h1>Crear @Model.TipoActivoNombre</h1>
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
 <form  asp-action="Crear">
     <div class="mb-3">
-        <label for="Nombre" class="form-label">Nombre</label>
-        <input type="text" id="Nombre" name="Nombre" class="form-control"/>
+        <label for="Activo.Nombre" class="form-label">Nombre</label>
+        <input type="text" id="Activo.Nombre" name="Activo.Nombre" class="form-control"/>
+        <span asp-validation-for="Activo.Nombre" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label for="Simnolo" class="form-label">Simbolo</label>
-        <input type="text" id="Simbolo" name="Simbolo" class="form-control" />
+        <label for="Activo.SIMBOLO" class="form-label">Simbolo</label>
+        <input type="text" id="Activo.SIMBOLO" name="Activo.SIMBOLO" class="form-control" />
+        <span asp-validation-for="Activo.SIMBOLO" class="text-danger"></span>
     </div>
+    <input type="hidden" asp-for="Activo.IDTIPOACTIVO"/>
+    <input type="hidden" asp-for="TipoActivoNombre"/>
 
     <button type="submit" class="btn btn-primary">Insertar</button>
-
+    <a class="btn btn-secondary" asp-action="Index">Cancelar</a>
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+}
