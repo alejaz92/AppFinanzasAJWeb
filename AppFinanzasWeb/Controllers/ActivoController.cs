@@ -102,5 +102,38 @@ namespace AppFinanzasWeb.Controllers
             await repositorioActivos.Actualizar(activo);
             return RedirectToAction(nameof(Index), new { Id = activoExiste.IDTIPOACTIVO });
         }
+
+        public async Task<IActionResult> Borrar(int id)
+        {
+            var activo = await repositorioActivos.ObtenerPorId(id);
+
+            if (activo is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            var esUsado = await repositorioActivos.EsUsado(id);
+
+            if (esUsado == 1)
+            {
+                // ver como mostrar el mensaje de que existen dependencias del activo
+            }
+
+            return View(activo);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BorrarActivo(int id)
+        {
+            var activoExiste = await repositorioActivos.ObtenerPorId(id);
+
+            if(activoExiste is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            await repositorioActivos.Borrar(activoExiste.Id);
+            return RedirectToAction(nameof(Index), new { Id = activoExiste.IDTIPOACTIVO });
+        }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Dapper;
 using AppFinanzasWeb.Models;
 using Microsoft.Data.SqlClient;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using Azure.Core.Pipeline;
 
 namespace AppFinanzasWeb.Servicios
 {
@@ -10,7 +12,8 @@ namespace AppFinanzasWeb.Servicios
         Task Crear(Activo activo);
         Task<Activo> ObtenerPorId(int id);
         Task Actualizar(Activo activo);
-
+        Task Borrar(int id);
+        Task<bool> EsUsado(int id);
     }
     public class RepositorioActivos : IRepositorioActivos
     {
@@ -63,6 +66,28 @@ namespace AppFinanzasWeb.Servicios
                                             SET Nombre = @Nombre,
                                             Simbolo = @SIMBOLO
                                             WHERE idActivo = @Id", activo);
+        }
+
+        public async Task Borrar(int id)
+        {
+            using var connection = new SqlConnection(connectionString);
+            await connection.ExecuteAsync("DELETE FROM Dim_Activo WHERE idActivo = @Id", new { id });
+        }
+
+        public async Task<bool> EsUsado(int id)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+
+            var esUsado = await connection.QuerySingleAsync<int>
+                                                ("sp_CheckActivoUso",
+                                                new
+                                                {
+                                                    ActivoId = id
+                                                },
+                                                commandType: System.Data.CommandType.StoredProcedure);
+
+            return Convert.ToBoolean(esUsado);
         }
     }
     
