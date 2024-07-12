@@ -41,12 +41,17 @@
                     </td>
                     <td>
                         <input type="hidden" value="@activo.Id " class="ids" />
-                        <a class="btn btn-primary" asp-action="Editar" asp-route-id="@activo.Id">Editar</a>
-                        <a class="btn btn-danger" asp-action="Borrar" asp-route-id="@activo.Id">Eliminar</a>
+                        <a class="btn btn-primary" asp-action="Editar" asp-route-id="@activo.Id">
+                            <i class="bi-pencil-fill"></i>
+                        </a>
+                        <a class="btn btn-danger" asp-action="Borrar" asp-route-id="@activo.Id">
+                            <i class="bi-trash-fill"></i>
+                        </a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
+
 }
 

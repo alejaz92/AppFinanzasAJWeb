@@ -112,12 +112,12 @@ namespace AppFinanzasWeb.Controllers
                 return RedirectToAction("NoEncontrado", "Home");
             }
 
-            var esUsado = await repositorioActivos.EsUsado(id);
+           
 
-            if (esUsado == 1)
-            {
-                // ver como mostrar el mensaje de que existen dependencias del activo
-            }
+            //if (await repositorioActivos.EsUsado(id))
+            //{
+            //    return Json(new { success = false, message = "El activo ua esta en uso" });
+            //}
 
             return View(activo);
         }
@@ -134,6 +134,11 @@ namespace AppFinanzasWeb.Controllers
 
             await repositorioActivos.Borrar(activoExiste.Id);
             return RedirectToAction(nameof(Index), new { Id = activoExiste.IDTIPOACTIVO });
+        }
+        [HttpGet]
+        public async Task<IActionResult> checkEsUsado(int id)
+        {
+            return Json(new { controlador = "Activo", result = await repositorioActivos.EsUsado(id) });
         }
     }
 }

@@ -81,21 +81,8 @@ namespace AppFinanzasWeb.Controllers
             await repositorioCuentas.Actualizar(cuenta);
             return RedirectToAction("Index");
         }
-
-        public async Task<IActionResult> Borrar(int id)
-        {
-            var cuenta = await repositorioCuentas.ObtenerPorId(id);
-
-            if (cuenta is null)
-            {
-                return RedirectToAction("NoEncontrado", "Home");
-            }
-
-            return View(cuenta);
-        }
-
         [HttpPost]
-        public async Task<IActionResult> BorrarCuenta(int id)
+        public  async Task<IActionResult> Borrar(int id)
         {
             var cuenta = await repositorioCuentas.ObtenerPorId(id);
 
@@ -105,7 +92,9 @@ namespace AppFinanzasWeb.Controllers
             }
 
             await repositorioCuentas.Borrar(id);
-            return RedirectToAction("Index");
+            return Ok();
         }
+
+       
     }
 }

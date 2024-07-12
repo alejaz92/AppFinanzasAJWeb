@@ -69,6 +69,7 @@ namespace AppFinanzasWeb.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost]
         public async Task<IActionResult> Borrar(int id)
         {
             var tarjeta = await repositorioTarjetas.ObtenerPorId(id);
@@ -78,22 +79,12 @@ namespace AppFinanzasWeb.Controllers
                 return RedirectToAction("NoEncontrado", "Home");
             }
 
-            return View(tarjeta);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> BorrarTarjeta(int id)
-        {
-            var cuenta = await repositorioTarjetas.ObtenerPorId(id);
-
-            if (cuenta is null)
-            {
-                return RedirectToAction("NoEncontrado", "Home");
-            }
 
             await repositorioTarjetas.Borrar(id);
-            return RedirectToAction("Index");
+            return Ok();
         }
+
+
 
         [HttpGet]
         public async Task<IActionResult> VerificarExisteTarjeta(string nombre)
