@@ -12,7 +12,7 @@ namespace AppFinanzasWeb.Servicios
         Task Actualizar(Cuenta cuenta);
         Task Borrar(int id);
         Task<bool> Existe(string nombre);
-
+        Task<bool> EsUsado(int id);
     }
     public class RepositorioCuentas: IRepositorioCuentas
     {
@@ -70,6 +70,22 @@ namespace AppFinanzasWeb.Servicios
                                     WHERE Nombre = @Nombre;",
                                     new { nombre });
             return existe == 1;
+        }
+
+        public async Task<bool> EsUsado(int id)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+
+            var esUsado = await connection.QuerySingleAsync<int>
+                                                ("sp_CheckCuentaUso",
+                                                new
+                                                {
+                                                    CuentaId = id
+                                                },
+                                                commandType: System.Data.CommandType.StoredProcedure);
+
+            return Convert.ToBoolean(esUsado);
         }
     }
 }

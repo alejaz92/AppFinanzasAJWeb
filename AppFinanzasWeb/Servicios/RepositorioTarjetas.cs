@@ -12,6 +12,7 @@ namespace AppFinanzasWeb.Servicios
         Task Actualizar(Tarjeta tarjeta);
         Task Borrar(int id);
         Task<bool> Existe(string nombre);
+        Task<bool> EsUsado(int id);
     }
     public class RepositorioTarjetas : IRepositorioTarjetas
     {
@@ -68,6 +69,22 @@ namespace AppFinanzasWeb.Servicios
                                     WHERE Nombre = @Nombre;",
                                     new { nombre });
             return existe == 1;
+        }
+
+        public async Task<bool> EsUsado(int id)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+
+            var esUsado = await connection.QuerySingleAsync<int>
+                                                ("sp_CheckTarjetaUso",
+                                                new
+                                                {
+                                                    TarjetaId = id
+                                                },
+                                                commandType: System.Data.CommandType.StoredProcedure);
+
+            return Convert.ToBoolean(esUsado);
         }
     }
 }

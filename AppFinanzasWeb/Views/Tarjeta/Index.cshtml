@@ -28,8 +28,9 @@
                     <a class="btn btn-primary" asp-action="Editar" asp-route-id="@tarjeta.Id">
                         <i class="bi-pencil-fill"></i>
                     </a>
-                    <a class="btn btn-danger" 
-                        onclick="openDeleteModal(@tarjeta.Id, '@Url.Action("Borrar", "Tarjeta")')">
+                    <a class="btn btn-danger"
+                       onclick="openDeleteModal(@tarjeta.Id, '@Url.Action("Borrar", "Tarjeta")',
+                    '@Url.Action("checkEsUsado", "Tarjeta")')">
                         <i class="bi-trash-fill"></i>
                     </a>
                 </td>

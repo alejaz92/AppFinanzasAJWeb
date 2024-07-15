@@ -98,5 +98,17 @@ namespace AppFinanzasWeb.Controllers
 
             return Json(true);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> checkEsUsado(int id)
+        {
+            var cuenta = await repositorioTarjetas.ObtenerPorId(id);
+            if (cuenta is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            return Json(new { controlador = "Cuenta", result = await repositorioTarjetas.EsUsado(id) });
+        }
     }
 }

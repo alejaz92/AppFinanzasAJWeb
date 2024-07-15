@@ -1,15 +1,18 @@
 ﻿
-function openDeleteModal(id, controlador, deleteURL) {
+function openDeleteModal(id, deleteURL, esUsadoURL) {
+   // console.log(id);
+
     $.ajax({
-        url: '/' + controlador + '/checkEsUsado',
+        url: esUsadoURL,
         type: 'GET',
         data: { id: id },
         success: function (response) {
             if (response.result) {
-                $('#deleteModal').modal('show');
-                $('#confirmDeleteButton').attr('onclick', `confirmDelete(${id}, '${deleteUrl}')`);
-            } else {
+                
                 $('#errorDeleteModal').modal('show');
+            } else {
+                $('#deleteModal').modal('show');
+                $('#confirmDeleteButton').attr('onclick', `confirmDelete(${id}, '${deleteURL}')`);    
             }
         }
 
@@ -44,6 +47,14 @@ document.getElementById('cancelButton').addEventListener('click', function () {
 
 document.getElementById('closeButton').addEventListener('click', function () {
     $('#deleteModal').modal('hide');
+});
+
+
+document.getElementById('closeButton2').addEventListener('click', function () {
+    $('#errorDeleteModal').modal('hide');
+});
+document.getElementById('acceptButton2').addEventListener('click', function () {
+    $('#errorDeleteModal').modal('hide');
 });
 
 function checkDelete(controlador, id) {

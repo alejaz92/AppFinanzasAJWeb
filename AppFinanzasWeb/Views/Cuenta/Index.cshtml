@@ -28,7 +28,10 @@
                     <a class="btn btn-primary" asp-action="Editar" asp-route-id="@cuenta.Id">
                         <i class="bi-pencil-fill"></i>
                     </a>
-                    <a class="btn btn-danger" onclick="openDeleteModal(@cuenta.Id, 'Cuenta', '@Url.Action("Borrar", "Cuenta")')">
+                    <a class="btn btn-danger" onclick="openDeleteModal(@cuenta.Id, '@Url.Action("Borrar", "Cuenta")',
+                    '@Url.Action("checkEsUsado", "Cuenta")')">  
+
+
                         <i class="bi-trash-fill"></i>
                     </a>
                 </td>
