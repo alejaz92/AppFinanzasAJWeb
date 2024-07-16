@@ -9,6 +9,7 @@ builder.Services.AddTransient<IRepositorioCuentas, RepositorioCuentas>();
 builder.Services.AddTransient<IRepositorioTarjetas, RepositorioTarjetas>();
 builder.Services.AddTransient<IRepositorioTiposActivo, RepositorioTiposActivo>();
 builder.Services.AddTransient<IRepositorioActivos, RepositorioActivos>();
+builder.Services.AddTransient<IRepositorioClaseMovimientos, RepositorioClaseMovimientos>();
 
 
 

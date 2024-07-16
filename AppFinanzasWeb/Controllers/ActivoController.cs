@@ -18,27 +18,26 @@ namespace AppFinanzasWeb.Controllers
             this.repositorioActivos = repositorioActivos;
         }
 
-        public async Task<IActionResult> Index(int? Id)
+        public async Task<IActionResult> Index(int? idTipoActivo)
         {
             var tiposActivo = await repositorioTiposActivo.Obtener();
-            ViewBag.TiposActivos = new SelectList(tiposActivo, "Id", "Nombre", Id);
-            ViewBag.SelectedIdTipoActivo = Id;
+            ViewBag.TiposActivos = new SelectList(tiposActivo, "Id", "Nombre", idTipoActivo);
+            ViewBag.SelectedIdTipoActivo = idTipoActivo;
 
-            if (!Id.HasValue)
+            if (!idTipoActivo.HasValue)
             {
                 return View(new List<Activo>());
             }
 
-
-            var activos = await repositorioActivos.ObtenerPorTipo(Id.Value);
+            var activos = await repositorioActivos.ObtenerPorTipo(idTipoActivo.Value);
             return View(activos);
 
         }
 
         [HttpGet]
-        public async Task<ActionResult> Crear(int Id)
+        public async Task<ActionResult> Crear(int idTipoActivo)
         {
-            var tipoActivo = await repositorioTiposActivo.ObtenerPorId(Id);
+            var tipoActivo = await repositorioTiposActivo.ObtenerPorId(idTipoActivo);
 
             if (tipoActivo is null)
             {
@@ -51,11 +50,8 @@ namespace AppFinanzasWeb.Controllers
                 {
                     IDTIPOACTIVO = tipoActivo.Id
                 },
-                TipoActivoNombre = tipoActivo.Nombre
+                TipoActivoNombre = tipoActivo.Nombre         
                 
-                
-
-
             };
 
             return View(viewModel);
@@ -66,11 +62,13 @@ namespace AppFinanzasWeb.Controllers
         {
             if (!ModelState.IsValid)
             {
+                var tipoActivo = await repositorioTiposActivo.ObtenerPorId(vmActivo.Activo.IDTIPOACTIVO);
+                vmActivo.TipoActivoNombre = tipoActivo.Nombre;
                 return View(vmActivo);
             }
 
             await repositorioActivos.Crear(vmActivo.Activo);
-            return RedirectToAction(nameof(Index), new {Id = vmActivo.Activo.IDTIPOACTIVO});
+            return RedirectToAction(nameof(Index), new { idTipoActivo = vmActivo.Activo.IDTIPOACTIVO });
         }
 
 
@@ -112,32 +110,19 @@ namespace AppFinanzasWeb.Controllers
                 return RedirectToAction("NoEncontrado", "Home");
             }
 
-           
-
-            //if (await repositorioActivos.EsUsado(id))
-            //{
-            //    return Json(new { success = false, message = "El activo ua esta en uso" });
-            //}
-
-            return View(activo);
+            await repositorioActivos.Borrar(id);
+            return Ok();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> BorrarActivo(int id)
+        [HttpGet]
+        public async Task<IActionResult> checkEsUsado(int id)
         {
-            var activoExiste = await repositorioActivos.ObtenerPorId(id);
-
-            if(activoExiste is null)
+            var activo = await repositorioActivos.ObtenerPorId(id);
+            if (activo is null)
             {
                 return RedirectToAction("NoEncontrado", "Home");
             }
 
-            await repositorioActivos.Borrar(activoExiste.Id);
-            return RedirectToAction(nameof(Index), new { Id = activoExiste.IDTIPOACTIVO });
-        }
-        [HttpGet]
-        public async Task<IActionResult> checkEsUsado(int id)
-        {
             return Json(new { controlador = "Activo", result = await repositorioActivos.EsUsado(id) });
         }
     }

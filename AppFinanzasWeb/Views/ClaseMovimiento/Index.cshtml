@@ -1,0 +1,79 @@
+﻿@model AppFinanzasWeb.ViewModels.ClaseMovimientoTipoViewModel
+@{
+    ViewData["Title"] = "Clases de Movimiento";
+}
+<h1>Clases de Movimiento</h1>
+
+<a asp-action="Crear" class="btn btn-primary mb-3">
+    Agregar Clase de Movimiento
+</a>
+
+<div class="row">
+    <div class="col-md-6">
+        <h3>Ingresos</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Descripción</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Ingresos)
+                {
+                    <tr>
+                        <td>@item.Descripcion</td>
+
+                        <td>
+                            <input type="hidden" value="@item.Id " class="ids" />
+                            <a class="btn btn-primary" asp-action="Editar" asp-route-id="@item.Id">
+                                <i class="bi-pencil-fill"></i>
+                            </a>
+                            <a class="btn btn-danger" onclick="openDeleteModal(@item.Id, '@Url.Action("Borrar", "ClaseMovimiento")',
+                            '@Url.Action("checkEsUsado", "ClaseMovimiento")')">
+                                <i class="bi-trash-fill"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="col-md-6">
+        <h3>Egresos</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Descripción</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Egresos)
+                {
+                    <tr>
+                        <td>@item.Descripcion</td>
+
+                        <td>
+                            <input type="hidden" value="@item.Id " class="ids" />
+                            <a class="btn btn-primary" asp-action="Editar" asp-route-id="@item.Id">
+                                <i class="bi-pencil-fill"></i>
+                            </a>
+                            <a class="btn btn-danger" onclick="openDeleteModal(@item.Id, '@Url.Action("Borrar", "ClaseMovimiento")',
+                            '@Url.Action("checkEsUsado", "ClaseMovimiento")')">
+                                <i class="bi-trash-fill"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- Incluimos el modal de eliminacion-->
+@Html.Partial("_DeleteModal")
+
+<script src="~/js/deleteModal.js"></script>

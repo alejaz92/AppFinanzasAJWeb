@@ -1,4 +1,4 @@
-﻿using ManejoPresupuesto.Validaciones;
+﻿using AppFinanzasWeb.Validaciones;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ManejoPresupuesto.Validaciones
+namespace AppFinanzasWeb.Validaciones
 {
     public class PrimeraLetraMayusculaAttribute : ValidationAttribute
     {

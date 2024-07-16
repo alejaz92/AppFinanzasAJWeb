@@ -63,7 +63,6 @@ namespace AppFinanzasWeb.Controllers
         }
 
         [HttpPost]
-
         public async Task<IActionResult> Editar(Cuenta cuenta)
         {
             var cuentaExiste = await repositorioCuentas.ObtenerPorId(cuenta.Id);
@@ -81,6 +80,7 @@ namespace AppFinanzasWeb.Controllers
             await repositorioCuentas.Actualizar(cuenta);
             return RedirectToAction("Index");
         }
+
         [HttpPost]
         public  async Task<IActionResult> Borrar(int id)
         {

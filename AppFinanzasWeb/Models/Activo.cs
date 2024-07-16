@@ -1,4 +1,4 @@
-﻿using ManejoPresupuesto.Validaciones;
+﻿using AppFinanzasWeb.Validaciones;
 using System.ComponentModel.DataAnnotations;
 
 namespace AppFinanzasWeb.Models

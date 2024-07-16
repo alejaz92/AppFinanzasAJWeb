@@ -8,8 +8,9 @@
 
 
 <form method="get" asp-controller="Activo" asp-action="Index" id="filterForm"> 
-    <label for="Id">Tipo de Activo</label>
-    <select id="Id" class="form-select mb-3" name="Id" asp-items="ViewBag.TiposActivos" onchange="document.getElementById('filterForm').submit();">
+    <label for="idTipoActivo">Tipo de Activo</label>
+    <select id="idTipoActivo" class="form-select mb-3" name="idTipoActivo" asp-items="ViewBag.TiposActivos"
+            onchange="document.getElementById('filterForm').submit();">
         <option value="">Selecciona un tipo</option>
     </select>
 </form>
@@ -17,7 +18,7 @@
 
 @if (Model.Any()) 
 {
-    <a asp-action="Crear" asp-route-id="@ViewBag.SelectedIdTipoActivo" class="btn btn-primary mb-3">
+    <a asp-action="Crear" asp-route-idTipoActivo="@(ViewBag.SelectedIdTipoActivo ?? 0)" class="btn btn-primary mb-3">
         Agregar Activo
     </a>
 
@@ -44,7 +45,8 @@
                         <a class="btn btn-primary" asp-action="Editar" asp-route-id="@activo.Id">
                             <i class="bi-pencil-fill"></i>
                         </a>
-                        <a class="btn btn-danger" asp-action="Borrar" asp-route-id="@activo.Id">
+                        <a class="btn btn-danger" onclick="openDeleteModal(@activo.Id, '@Url.Action("Borrar", "Activo")',
+                        '@Url.Action("checkEsUsado", "Activo")')">
                             <i class="bi-trash-fill"></i>
                         </a>
                     </td>
@@ -52,6 +54,12 @@
             }
         </tbody>
     </table>
+
+
+    <!-- Incluimos el modal de eliminacion-->
+    @Html.Partial("_DeleteModal")
+
+    <script src="~/js/deleteModal.js"></script>
 
 }
 
