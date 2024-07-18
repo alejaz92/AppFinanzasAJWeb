@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using AppFinanzasWeb.Models;
 using Microsoft.Data.SqlClient;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AppFinanzasWeb.Servicios
 {
@@ -87,5 +88,7 @@ namespace AppFinanzasWeb.Servicios
 
             return Convert.ToBoolean(esUsado);
         }
+
+
     }
 }

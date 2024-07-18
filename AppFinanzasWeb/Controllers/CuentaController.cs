@@ -2,16 +2,19 @@
 using AppFinanzasWeb.Servicios;
 using Microsoft.AspNetCore.Mvc;
 using System.Reflection.Metadata.Ecma335;
+using System.Linq;
 
 namespace AppFinanzasWeb.Controllers
 {
     public class CuentaController : Controller
     {
         private readonly IRepositorioCuentas repositorioCuentas;
+        private readonly IRepositorioTiposActivo repositorioTiposActivo;
 
-        public CuentaController(IRepositorioCuentas repositorioCuentas)
+        public CuentaController(IRepositorioCuentas repositorioCuentas, IRepositorioTiposActivo repositorioTiposActivo)
         {
             this.repositorioCuentas = repositorioCuentas;
+            this.repositorioTiposActivo = repositorioTiposActivo;
         }
         public async Task<IActionResult> Index()
         {
@@ -105,6 +108,39 @@ namespace AppFinanzasWeb.Controllers
             }
 
             return Json(new { controlador = "Cuenta", result = await repositorioCuentas.EsUsado(id) });
+        }
+
+        public async Task<IActionResult> AsignarTiposActivos(int Id)
+        {
+            var cuenta = await repositorioCuentas.ObtenerPorId(Id);
+
+            if (cuenta is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            var tiposActivosAsignados = await repositorioTiposActivo.ObtenerPorCuenta(Id);
+            var tiposActivosAsignadosIds = tiposActivosAsignados.Select(ta => ta.IdTipoActivo).ToList();
+
+            var tiposActivos = await repositorioTiposActivo.Obtener();
+
+            ViewBag.Cuenta = cuenta;
+            ViewBag.TiposActivosAsignados = tiposActivosAsignadosIds;
+            return View(tiposActivos);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AsignarTiposActivos(int id, List<int> IdTipoActivos)
+        {
+            var success = await repositorioTiposActivo.ActualizarCuentaTiposActivos(id, IdTipoActivos);
+
+            if(!success)
+            {
+                TempData["Error"] = "No se puede desasignar un tipo de activo que tiene registros existentes. ";
+                return RedirectToAction("AsignarTiposActivos", new { id });
+            }
+
+            return RedirectToAction("Index");
         }
     }
 

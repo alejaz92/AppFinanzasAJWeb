@@ -6,5 +6,7 @@
         public string Nombre { get; set; }
         public int Activa { get; set; }
 
+        // Relacion con Cuentas
+        public ICollection<CuentaTipoActivo> CuentaTipoActivos { get; set; }
     }
 }

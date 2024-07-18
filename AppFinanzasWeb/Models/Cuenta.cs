@@ -12,5 +12,8 @@ namespace AppFinanzasWeb.Models
         [PrimeraLetraMayuscula]
         [Remote(action: "VerificarExisteCuenta", controller: "Cuenta")]
         public string Nombre { get; set; }  
+
+        //Relacion con tipo de activos
+        public ICollection<CuentaTipoActivo> CuentaTipoActivos { get; set; }
     }
 }
