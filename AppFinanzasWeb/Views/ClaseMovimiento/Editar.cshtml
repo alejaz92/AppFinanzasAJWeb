@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Editar Clase de Movimiento";
 }
-<h1>Editar Clase de Movimiento: @Model.Descripcion</h1>
+<h1>Editar Clase de Movimiento: @Model.ClaseMovimientoNombre</h1>
 
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -12,9 +12,9 @@
     <input type="hidden" asp-for="IngEgr" />
 
     <div class="mb-3">
-        <label asp-for="Descripcion" class="form-label"></label>
-        <input type="text" asp-for="Descripcion" class="form-control" />
-        <span asp-validation-for="Descripcion" class="text-danger"></span>
+        <label asp-for="ClaseMovimientoNombre" class="form-label"></label>
+        <input type="text" asp-for="ClaseMovimientoNombre" class="form-control" />
+        <span asp-validation-for="ClaseMovimientoNombre" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-primary">Guardar</button>

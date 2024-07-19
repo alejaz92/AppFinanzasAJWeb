@@ -1,3 +1,10 @@
 ﻿.dropdown:hover .dropdown-menu {
     display: block;
     margin-top: 0; /* Permite que el menú se muestre justo debajo del enlace */
+}
+
+
+
+.text-end {
+    text-align: right; /* Alineación a la derecha para el monto */
+}

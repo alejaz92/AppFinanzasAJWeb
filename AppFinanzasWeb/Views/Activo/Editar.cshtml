@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Editar Activo";
 }
-<h1>Editar Activo: @Model.Nombre</h1>
+<h1>Editar Activo: @Model.ActivoNombre</h1>
 
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -11,9 +11,9 @@
     <input type="hidden" asp-for="Id" />
 
     <div class="mb-3">
-        <label asp-for="Nombre" class="form-label"></label>
-        <input type="text" asp-for="Nombre" class="form-control" />
-        <span asp-validation-for="Nombre" class="text-danger"></span>
+        <label asp-for="ActivoNombre" class="form-label"></label>
+        <input type="text" asp-for="ActivoNombre" class="form-control" />
+        <span asp-validation-for="ActivoNombre" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="SIMBOLO" class="form-label"></label>

@@ -27,14 +27,14 @@ namespace AppFinanzasWeb.Servicios
         public async Task Crear(Cuenta cuenta)
         {
             using var connection = new SqlConnection(connectionString);
-            await connection.ExecuteAsync(@"INSERT INTO Dim_Cuenta(Nombre) VALUES (@Nombre)", cuenta);
+            await connection.ExecuteAsync(@"INSERT INTO Dim_Cuenta(Nombre) VALUES (@CuentaNombre)", cuenta);
         }
 
         public async Task<IEnumerable<Cuenta>> Obtener()
         {
             using var connection = new SqlConnection(connectionString);
 
-            return await connection.QueryAsync<Cuenta>(@"SELECT IDCUENTA Id, NOMBRE FROM Dim_Cuenta");
+            return await connection.QueryAsync<Cuenta>(@"SELECT IDCUENTA Id, NOMBRE CuentaNombre FROM Dim_Cuenta");
         }
 
         public async Task<Cuenta> ObtenerPorId(int Id)
@@ -42,7 +42,7 @@ namespace AppFinanzasWeb.Servicios
             using var connection = new SqlConnection(connectionString);
 
             return await connection.QueryFirstOrDefaultAsync<Cuenta>(@"
-                                                                     SELECT idCuenta Id, Nombre
+                                                                     SELECT idCuenta Id, Nombre CuentaNombre
                                                                      FROM Dim_Cuenta
                                                                      WHERE idCuenta = @Id",
                                                                      new { Id });
@@ -52,7 +52,7 @@ namespace AppFinanzasWeb.Servicios
         {
             using var connection = new SqlConnection(connectionString);
             await connection.ExecuteAsync(@"UPDATE Dim_Cuenta 
-                                            SET Nombre = @Nombre
+                                            SET Nombre = @CuentaNombre
                                             WHERE idCuenta = @Id", cuenta );
         }
 
@@ -68,7 +68,7 @@ namespace AppFinanzasWeb.Servicios
             var existe = await connection.QueryFirstOrDefaultAsync<int>(
                                     @"SELECT 1
                                     FROM Dim_Cuenta
-                                    WHERE Nombre = @Nombre;",
+                                    WHERE Nombre = @CuentaNombre;",
                                     new { nombre });
             return existe == 1;
         }

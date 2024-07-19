@@ -22,7 +22,7 @@
                 @foreach (var item in Model.Ingresos)
                 {
                     <tr>
-                        <td>@item.Descripcion</td>
+                        <td>@item.ClaseMovimientoNombre</td>
 
                         <td>
                             <input type="hidden" value="@item.Id " class="ids" />
@@ -53,7 +53,7 @@
                 @foreach (var item in Model.Egresos)
                 {
                     <tr>
-                        <td>@item.Descripcion</td>
+                        <td>@item.ClaseMovimientoNombre</td>
 
                         <td>
                             <input type="hidden" value="@item.Id " class="ids" />

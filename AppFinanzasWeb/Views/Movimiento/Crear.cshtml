@@ -1,0 +1,17 @@
+﻿@model Movimiento
+@{
+    ViewData["Title"] = "Nuevo Movimiento";
+}
+<h1>Nuevo Movimiento</h1>
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<form asp-action="Crear">
+
+    <button type="submit" class="btn btn-primary">Insertar</button>
+    <a class="btn btn-secondary" asp-action="Index">Cancelar</a>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

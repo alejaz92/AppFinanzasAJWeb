@@ -1,0 +1,111 @@
+﻿@model AppFinanzasWeb.ViewModels.MovimientosIndexViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Movimentos";
+}
+
+<div class="container-mt-4">
+    <h1>Movimientos</h1>
+    <a asp-action="Crear" class="btn btn-primary mb-3">
+        Nuevo <i class="bi-plus-lg"></i>
+    </a>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Tipo Movimiento</th>
+                    <th>Clase Movimiento</th>
+                    <th>Detalle</th>
+                    <th>Cuenta</th>
+                    <th>Moneda</th>
+                    <th class="text-end">Monto</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var movimiento in Model.Movimientos)
+                {
+                    <tr>
+                        <td>@movimiento.Fecha.ToShortDateString()</td>
+                        <td>@movimiento.TipoMovimiento</td>
+                        <td>@movimiento.ClaseMovimientoNombre</td>
+                        <td>@movimiento.Comentario</td>
+                        <td>@movimiento.CuentaNombre</td>
+                        <td>@movimiento.ActivoNombre</td>
+                        <td class="text-end custom-monto @(movimiento.TipoMovimiento == "Egreso" ? "bg-danger text-light" : "bg-success text-light")">
+                            $@movimiento.Monto.ToString("N2", new CultureInfo("es-ES"))
+                        </td>
+                        <td>
+                            <a class="btn btn-warning" title="Reintegro">
+                                <i class="bi-box-arrow-in-up-right"></i>
+                            </a>
+                            <a class="btn btn-primary" asp-action="Editar" title="Editar">
+                                <i class="bi-pencil-fill"></i>
+                            </a>
+                            <a class="btn btn-danger" title="Borrar">
+                                <i class="bi-trash-fill"></i>
+                            </a>
+                            
+                        </td>
+                
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <!-- Página anterior -->
+            <li class="page-item @(Model.PaginaActual == 1 ? "disabled" : "")">
+                <a class="page-link" href="?pagina=@(Model.PaginaActual - 1)" aria-label="Anterior">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+
+            <!-- Mostrar página 1 -->
+            @if (Model.PaginasTotales > 1)
+            {
+                <li class="page-item @(Model.PaginaActual == 1 ? "active" : "")">
+                    <a class="page-link" href="?pagina=1">1</a>
+                </li>
+                @if (Model.PaginaActual > 4 && Model.PaginasTotales > 5)
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                }
+            }
+
+            <!-- Páginas cercanas -->
+            @for (int i = Math.Max(2, Model.PaginaActual - 1); i <= Math.Min(Model.PaginasTotales - 1, Model.PaginaActual + 1); i++)
+            {
+                <li class="page-item @(i == Model.PaginaActual ? "active" : "")">
+                    <a class="page-link" href="?pagina=@i">@i</a>
+                </li>
+            }
+
+            <!-- Mostrar página final -->
+            @if (Model.PaginasTotales > 1)
+            {
+                @if (Model.PaginaActual < Model.PaginasTotales - 3 && Model.PaginasTotales > 5)
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                }
+                <li class="page-item @(Model.PaginaActual == Model.PaginasTotales ? "active" : "")">
+                    <a class="page-link" href="?pagina=@Model.PaginasTotales">@Model.PaginasTotales</a>
+                </li>
+            }
+
+            <!-- Página siguiente -->
+            <li class="page-item @(Model.PaginaActual == Model.PaginasTotales ? "disabled" : "")">
+                <a class="page-link" href="?pagina=@(Model.PaginaActual + 1)" aria-label="Siguiente">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>

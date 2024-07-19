@@ -29,7 +29,7 @@ namespace AppFinanzasWeb.Servicios
         {
             using var connection = new SqlConnection(connectionString);
 
-            return await connection.QueryAsync<ClaseMovimiento>(@"SELECT IDCLASEMOVIMIENTO Id, descripcion, ingegr 
+            return await connection.QueryAsync<ClaseMovimiento>(@"SELECT IDCLASEMOVIMIENTO Id, descripcion ClaseMovimientoNombre, ingegr 
             FROM Dim_ClaseMovimiento");
         }
 
@@ -37,14 +37,14 @@ namespace AppFinanzasWeb.Servicios
         {
             using var connection = new SqlConnection(connectionString);
             await connection.ExecuteAsync(@"INSERT INTO Dim_ClaseMovimiento(Descripcion, IngEgr) VALUES 
-            (@Descripcion, @IngEgr)", claseMovimiento);
+            (@ClaseMovimientoNombre, @IngEgr)", claseMovimiento);
         }
 
         public async Task Actualizar(ClaseMovimiento claseMovimiento)
         {
             using var connection = new SqlConnection(connectionString);
             await connection.ExecuteAsync(@"UPDATE Dim_ClaseMovimiento 
-                                            SET Descripcion = @Descripcion
+                                            SET Descripcion = @ClaseMovimientoNombre
                                             WHERE idClaseMovimiento = @Id", claseMovimiento);
         }
 
@@ -53,7 +53,7 @@ namespace AppFinanzasWeb.Servicios
             using var connection = new SqlConnection(connectionString);
 
             return await connection.QueryFirstOrDefaultAsync<ClaseMovimiento>(@"
-                                                                     SELECT idClaseMovimiento Id, Descripcion, IngEgr
+                                                                     SELECT idClaseMovimiento Id, Descripcion ClaseMovimientoNombre, IngEgr
                                                                      FROM Dim_ClaseMovimiento
                                                                      WHERE idClaseMovimiento = @Id",
                                                                      new { Id });
@@ -65,7 +65,7 @@ namespace AppFinanzasWeb.Servicios
             var existe = await connection.QueryFirstOrDefaultAsync<int>(
                                     @"SELECT 1
                                     FROM Dim_ClaseMovimiento
-                                    WHERE Descripcion = @Descripcion;",
+                                    WHERE Descripcion = @ClaseMovimientoNombre;",
                                     new { descripcion });
             return existe == 1;
         }

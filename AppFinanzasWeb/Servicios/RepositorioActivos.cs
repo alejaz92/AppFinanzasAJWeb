@@ -29,7 +29,7 @@ namespace AppFinanzasWeb.Servicios
             using var connection = new SqlConnection(connectionString);
 
             return await connection.QueryAsync<Activo>(@"
-                                                                     SELECT idActivo Id, Simbolo SIMBOLO, Nombre
+                                                                     SELECT idActivo Id, Simbolo SIMBOLO, Nombre ActivoNombre
                                                                      FROM Dim_Activo
                                                                      WHERE idTipoActivo = @Id",
                                                                      new { Id });
@@ -43,7 +43,7 @@ namespace AppFinanzasWeb.Servicios
             using var connection = new SqlConnection(connectionString);
 
             await connection.ExecuteAsync(@"INSERT INTO Dim_Activo (idTipoActivo, nombre, simbolo, esPrincipal, 
-                                            esReferencia) VALUES (@IDTIPOACTIVO, @Nombre, @SIMBOLO, @ESPRINCIPAL,
+                                            esReferencia) VALUES (@IDTIPOACTIVO, @ActivoNombre, @SIMBOLO, @ESPRINCIPAL,
                                             @ESREFERENCIACOTIZ)", activo);
 
         }
@@ -53,7 +53,7 @@ namespace AppFinanzasWeb.Servicios
             using var connection = new SqlConnection(connectionString);
 
             return await connection.QueryFirstOrDefaultAsync<Activo>(@"
-                                                                     SELECT idActivo Id, Nombre, SIMBOLO, IDTIPOACTIVO
+                                                                     SELECT idActivo Id, Nombre ActivoNombre, SIMBOLO, IDTIPOACTIVO
                                                                      FROM Dim_Activo
                                                                      WHERE idActivo = @Id",
                                                                      new { Id });
@@ -63,7 +63,7 @@ namespace AppFinanzasWeb.Servicios
         {
             using var connection = new SqlConnection(connectionString);
             await connection.ExecuteAsync(@"UPDATE Dim_Activo 
-                                            SET Nombre = @Nombre,
+                                            SET Nombre = @ActivoNombre,
                                             Simbolo = @SIMBOLO
                                             WHERE idActivo = @Id", activo);
         }
