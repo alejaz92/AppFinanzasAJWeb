@@ -68,7 +68,7 @@ namespace AppFinanzasWeb.Servicios
             var existe = await connection.QueryFirstOrDefaultAsync<int>(
                                     @"SELECT 1
                                     FROM Dim_Cuenta
-                                    WHERE Nombre = @CuentaNombre;",
+                                    WHERE Nombre = @Nombre;",
                                     new { nombre });
             return existe == 1;
         }

@@ -11,6 +11,7 @@ namespace AppFinanzasWeb.Models
         [StringLength(maximumLength:50)]
         [PrimeraLetraMayuscula]
         [Remote(action: "VerificarExisteCuenta", controller: "Cuenta")]
+        [Display(Name = "Nombre")]
         public string CuentaNombre { get; set; }  
 
         //Relacion con tipo de activos
