@@ -65,7 +65,7 @@ namespace AppFinanzasWeb.Servicios
             var existe = await connection.QueryFirstOrDefaultAsync<int>(
                                     @"SELECT 1
                                     FROM Dim_ClaseMovimiento
-                                    WHERE Descripcion = @ClaseMovimientoNombre;",
+                                    WHERE Descripcion = @Descripcion;",
                                     new { descripcion });
             return existe == 1;
         }

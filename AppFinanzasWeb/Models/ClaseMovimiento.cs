@@ -12,6 +12,7 @@ namespace AppFinanzasWeb.Models
         [StringLength(maximumLength: 60)]
         [PrimeraLetraMayuscula]
         [Remote(action: "VerificarExisteClaseMovimiento", controller: "ClaseMovimiento")]
+        [Display(Name = "Descripción")]
         public string ClaseMovimientoNombre { get; set; }
 
         [Required(ErrorMessage = "El campo {0} es requerido")]
