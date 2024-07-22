@@ -1,4 +1,4 @@
-﻿@model Movimiento
+﻿@model AppFinanzasWeb.ViewModels.MovimientoViewModel
 @{
     ViewData["Title"] = "Nuevo Movimiento";
 }
@@ -6,12 +6,104 @@
 
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-<form asp-action="Crear">
 
-    <button type="submit" class="btn btn-primary">Insertar</button>
-    <a class="btn btn-secondary" asp-action="Index">Cancelar</a>
-</form>
+<div class="container mt-4">
+    <form asp-action="Crear" method="post">
+
+        <div class="form-group mb-3">
+            <label for="TipoMovimiento">Tipo de Movimiento</label>
+            <select class="form-control" asp-for="TipoMovimiento" id="TipoMovimiento">
+                <option value="">Seleccione</option>
+                <option value="Ingreso">Ingreso</option>
+                <option value="Egreso">Egreso</option>
+                <option value="Intercambio">Intercambio</option>
+            </select>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="Fecha">Fecha</label>
+            <input class="form-control" asp-for="Fecha" type="date" id="Fecha" />
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="Activo">Moneda</label>
+            <select asp-for="IdActivo" class="form-control">
+                @foreach (var activo in ViewBag.Activos)
+                {
+                    <option value="@activo.Id">@activo.ActivoNombre</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group mb-3" id="CuentaIngreso">
+            <label for="IdCuentaIngreso">Cuenta de Ingreso</label>
+            <select asp-for="IdCuentaIngreso" class="form-control">
+                @foreach (var cuenta in ViewBag.Cuentas)
+                {
+                    <option value="@cuenta.Id">@cuenta.CuentaNombre</option>
+                }
+            </select>
+        </div>
+        <div class="form-group mb-3" id="CuentaEgreso">
+            <label for="IdCuentaEgreso">Cuenta de Egreso</label>
+            <select asp-for="IdCuentaEgreso" class="form-control">
+                @foreach (var cuenta in ViewBag.Cuentas)
+                {
+                    <option value="@cuenta.Id">@cuenta.CuentaNombre</option>
+                }
+            </select>
+        </div>
+        <div class="form-group mb-3" id="ClaseIngreso">
+            <label for="IdClaseMovimiento">Clase de Ingreso</label>
+            <select asp-for="IdClaseMovimiento" class="form-control">
+                @foreach (var clase in ViewBag.ClasesIngreso)
+                {
+                    <option value="@clase.Id">@clase.ClaseMovimientoNombre</option>
+                }
+            </select>
+        </div>
+        <div class="form-group mb-3" id="ClaseEgreso">
+            <label for="IdClaseMovimiento">Clase de Egreso</label>
+            <select asp-for="IdClaseMovimiento" class="form-control">
+                @foreach (var clase in ViewBag.ClasesEgreso)
+                {
+                    <option value="@clase.Id">@clase.ClaseMovimientoNombre</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="Detalle">Detalle</label>
+            <input asp-for="Detalle" class="form-control" />
+        </div>
+        <div class="form-group mb-3">
+            <label for="Monto">Monto</label>
+            <input asp-for="Monto" class="form-control" type="number" step="0.01" />
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Insertar</button>
+            <a class="btn btn-secondary" asp-action="Index">Cancelar</a>
+        </div>
+        
+    </form>
+</div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // JavaScript para mostrar/ocultar campos según el tipo de movimiento
+        document.getElementById("TipoMovimiento").addEventListener("change", function () {
+            var tipo = this.value;
+            document.getElementById("CuentaIngreso").style.display = (tipo === "Ingreso" || tipo === "Intercambio") ? "block" : "none";
+            document.getElementById("CuentaEgreso").style.display = (tipo === "Egreso" || tipo === "Intercambio") ? "block" : "none";
+            document.getElementById("ClaseIngreso").style.display = (tipo === "Ingreso") ? "block" : "none";
+            document.getElementById("ClaseEgreso").style.display = (tipo === "Egreso") ? "block" : "none";
+        });
+
+        // Inicializar la vista
+        document.getElementById("TipoMovimiento").dispatchEvent(new Event("change"));
+    </script>
 }
 

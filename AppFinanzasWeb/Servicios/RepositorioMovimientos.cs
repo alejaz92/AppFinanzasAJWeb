@@ -7,6 +7,7 @@ namespace AppFinanzasWeb.Servicios
 {
     public interface IRepositorioMovimientos
     {
+        Task<int> ObtenerIdMaximo();
         Task<IEnumerable<Movimiento>> ObtenerMovimientosPaginacion(int pagina, int cantidadPorPagina);
         Task<int> ObtenerTotalMovimientos();
     }
@@ -54,6 +55,21 @@ namespace AppFinanzasWeb.Servicios
             using var connection = new SqlConnection(connectionString);
             var sql = "SELECT COUNT(*) FROM Fact_Movimiento WHERE idClaseMovimiento IS NOT NULL";
             return await connection.ExecuteScalarAsync<int>(sql);
+        }
+
+        public async Task<int> ObtenerIdMaximo()
+        {
+            using var conection = new SqlConnection(connectionString);
+
+            var sql = "SELECT ISNULL(MAX(idMovimiento), 0) FROM Fact_Movimiento";
+            return await conection.ExecuteScalarAsync<int>(sql);
+        }
+
+        public async Task InsertarMovimiento(Movimiento movimiento)
+        {
+            using var connection  = new SqlConnection(connectionString);
+
+            var sql = @"INSERT INTO Fact_Movimiento (IdMovimiento)"
         }
     }
 }

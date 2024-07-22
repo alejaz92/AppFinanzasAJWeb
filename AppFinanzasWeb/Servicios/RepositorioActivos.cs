@@ -14,6 +14,7 @@ namespace AppFinanzasWeb.Servicios
         Task Actualizar(Activo activo);
         Task Borrar(int id);
         Task<bool> EsUsado(int id);
+        Task<IEnumerable<Activo>> ObtenerPorTipo(string nombreTipo);
     }
     public class RepositorioActivos : IRepositorioActivos
     {
@@ -89,6 +90,20 @@ namespace AppFinanzasWeb.Servicios
 
             return Convert.ToBoolean(esUsado);
         }
+
+        public async Task<IEnumerable<Activo>> ObtenerPorTipo(string nombreTipo)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            return await connection.QueryAsync<Activo>(@"
+                                                        SELECT idActivo Id, A.nombre ActivoNombre, SIMBOLO, 
+                                                        A.idTipoActivo
+                                                        FROM [dbo].[Dim_Activo] A
+                                                        INNER JOIN [dbo].[Dim_Tipo_Activo] TA ON 
+                                                        TA.idTipoActivo = A.idTipoActivo
+                                                        WHERE TA.nombre = @nombreTipo",
+                                                            new { nombreTipo });
+}
     }
     
 }
