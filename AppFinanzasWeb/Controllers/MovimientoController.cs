@@ -10,10 +10,15 @@ namespace AppFinanzasWeb.Controllers
     public class MovimientoController : Controller
     {
         private readonly IRepositorioMovimientos repositorioMovimientos;
+        private readonly IRepositorioActivos repositorioActivos;
+        private readonly IRepositorioCuentas repositorioCuentas;        
 
-        public MovimientoController(IRepositorioMovimientos repositorioMovimientos)
+        public MovimientoController(IRepositorioMovimientos repositorioMovimientos, IRepositorioActivos repositorioActivos,
+            IRepositorioCuentas repositorioCuentas)
         {
             this.repositorioMovimientos = repositorioMovimientos;
+            this.repositorioActivos = repositorioActivos;
+            this.repositorioCuentas = repositorioCuentas;
         }
 
         public async Task<IActionResult> Index(int pagina = 1)
@@ -34,16 +39,19 @@ namespace AppFinanzasWeb.Controllers
             return View(viewModel);
         }
 
-        public IActionResult Crear()
-        {
-            return View();
-        }
+        //public async IActionResult Crear()
+        //{
+        //    var activos = await repositorioActivos.ObtenerPorTipo(1);
+        //    //var cuentas = await repositorioCuentas.Obtener
 
-        [HttpPost]
-        public async Task<IActionResult> CrearMovRegular()
-        {
+        //    return View();
+        //}
 
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> CrearMovRegular()
+        //{
+
+        //}
 
     }
 }
