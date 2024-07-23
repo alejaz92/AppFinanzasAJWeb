@@ -33,19 +33,24 @@
                         <td>@movimiento.Comentario</td>
                         <td>@movimiento.CuentaNombre</td>
                         <td>@movimiento.ActivoNombre</td>
-                        <td class="text-end custom-monto @(movimiento.TipoMovimiento == "Egreso" ? "bg-danger text-light" : "bg-success text-light")">
+                        <td class="text-end custom-monto @(movimiento.TipoMovimiento == "Egreso" ? "table-danger" : "table-success")">
                             $@movimiento.Monto.ToString("N2", new CultureInfo("es-ES"))
                         </td>
                         <td>
-                            <a class="btn btn-warning" title="Reintegro">
-                                <i class="bi-box-arrow-in-up-right"></i>
-                            </a>
-                            <a class="btn btn-primary" asp-action="Editar" title="Editar">
-                                <i class="bi-pencil-fill"></i>
-                            </a>
-                            <a class="btn btn-danger" title="Borrar">
+
+                            <a class="btn btn-danger" title="Borrar" onclick="openDeleteModal(@movimiento.IdMovimiento,
+                            '@Url.Action("Borrar", "Movimiento")','@Url.Action("checkEsUsado", "Movimiento")')">
                                 <i class="bi-trash-fill"></i>
                             </a>
+                            @if (movimiento.TipoMovimiento == "Egreso")
+                            {
+                                <a class="btn btn-warning" title="Reintegro">
+                                    <i class="bi-box-arrow-in-up-right"></i>
+                                </a>
+                            }                           
+@*                             <a class="btn btn-primary" asp-action="Editar" title="Editar">
+                                <i class="bi-pencil-fill"></i>
+                            </a> *@                           
                             
                         </td>
                 
@@ -109,3 +114,8 @@
         </ul>
     </nav>
 </div>
+
+<!-- Incluimos el modal de eliminacion-->
+@Html.Partial("_DeleteModal")
+
+<script src="~/js/deleteModal.js"></script>

@@ -4,6 +4,11 @@
 }
 <h1>Nuevo Movimiento</h1>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
 
@@ -55,7 +60,7 @@
         </div>
         <div class="form-group mb-3" id="ClaseIngreso">
             <label for="IdClaseMovimiento">Clase de Ingreso</label>
-            <select asp-for="IdClaseMovimiento" class="form-control">
+            <select asp-for="IdClaseIngreso" class="form-control">
                 @foreach (var clase in ViewBag.ClasesIngreso)
                 {
                     <option value="@clase.Id">@clase.ClaseMovimientoNombre</option>
@@ -64,7 +69,7 @@
         </div>
         <div class="form-group mb-3" id="ClaseEgreso">
             <label for="IdClaseMovimiento">Clase de Egreso</label>
-            <select asp-for="IdClaseMovimiento" class="form-control">
+            <select asp-for="IdClaseEgreso" class="form-control">
                 @foreach (var clase in ViewBag.ClasesEgreso)
                 {
                     <option value="@clase.Id">@clase.ClaseMovimientoNombre</option>
@@ -83,7 +88,7 @@
 
         <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-primary">Insertar</button>
-            <a class="btn btn-secondary" asp-action="Index">Cancelar</a>
+            <a class="btn btn-secondary" asp-action="Index">Volver</a>
         </div>
         
     </form>
@@ -104,6 +109,11 @@
 
         // Inicializar la vista
         document.getElementById("TipoMovimiento").dispatchEvent(new Event("change"));
+
+        // Limpiar formulario después de envío exitoso
+        if (@Html.Raw(Json.Serialize(TempData["SuccessMessage"])) != null) {
+            document.getElementById("movimientoForm").reset();
+        }
     </script>
 }
 

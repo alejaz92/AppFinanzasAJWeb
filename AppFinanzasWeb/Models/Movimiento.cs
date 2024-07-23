@@ -18,7 +18,7 @@ namespace AppFinanzasWeb.Models
         public Tiempo Tiempo { get; set; }
         [Required(ErrorMessage = "El campo {0} es requerido")]
         public string TipoMovimiento { get; set; }
-        public int IdClaseMovimiento { get; set; }
+        public int? IdClaseMovimiento { get; set; }
         public string ClaseMovimientoNombre { get; set; }
 
         public ClaseMovimiento ClaseMovimiento { get; set; }

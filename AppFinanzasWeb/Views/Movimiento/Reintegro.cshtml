@@ -1,0 +1,55 @@
+﻿@model AppFinanzasWeb.ViewModels.MovimientoReintegroViewModel
+@{
+    ViewData["title"] = "Registrar Reintegro";
+}
+
+<div class="container mt-5">
+    <h2>Reintegro</h2>
+
+    <form asp-action="Reintegro" method="post">
+        <div class="mb-3">
+            <label class="form-label">Fecha</label>
+            <input type="date" asp-for="movimiento.Fecha" class="form-control" readonly />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Clase de Movimiento</label>
+            <input type="text" asp-for="movimiento.ClaseMovimientoNombre" class="form-control" readonly />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Detalle</label>
+            <input type="text" asp-for="movimiento.Comentario" class="form-control" readonly />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Cuenta Original</label>
+            <input type="text" asp-for="movimiento.CuentaNombre" class="form-control" readonly />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Moneda</label>
+            <input type="text" asp-for="movimiento.ActivoNombre" class="form-control" readonly />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Detalle</label>
+            <input type="text" asp-for="movimiento.Comentario" class="form-control" readonly />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Monto Original</label>
+            <input type="text" asp-for="movimiento.Monto" class="form-control" readonly />
+        </div>
+
+        <hr />
+
+        <div class="mb-3">
+            <label class="form-label">Cuenta Devolución</label>
+            <select class=" mb-3" asp-for="cuentaReint" class="form-control" asp-items="ViewBag.Cuentas" 
+            value="@Model.movimiento.CuentaNombre">
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Monto a Reintegrar</label>
+            <input class=" mb-3" asp-for="montoReint" class="form-control" type="number" required/>
+        </div>
+        <button type="submit" class="btn btn-primary">Registrar</button>
+        <a class="btn btn-secondary" asp-action="Index">Volver</a>
+    </form>
+</div>

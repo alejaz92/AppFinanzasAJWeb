@@ -2,13 +2,18 @@
 using AppFinanzasWeb.Models;
 using Microsoft.Data.SqlClient;
 using System.Data.Common;
+using System.Data.SqlTypes;
+using Microsoft.Identity.Client;
 
 namespace AppFinanzasWeb.Servicios
 {
     public interface IRepositorioMovimientos
     {
+        Task Borrar(int id);
+        Task InsertarMovimiento(Movimiento movimiento);
         Task<int> ObtenerIdMaximo();
         Task<IEnumerable<Movimiento>> ObtenerMovimientosPaginacion(int pagina, int cantidadPorPagina);
+        Task<Movimiento> ObtenerPorId(int id);
         Task<int> ObtenerTotalMovimientos();
     }
 
@@ -34,7 +39,7 @@ namespace AppFinanzasWeb.Servicios
 	                        A.nombre ActivoNombre, 
 	                        CAST(MO.monto AS decimal (18,2)) MONTO, 
 	                        MO.IDMOVIMIENTO 
-                        FROM [dbo].[Fact_Movimiento] MO 
+                        FROM [dbo].[Fact_Movimiento2] MO 
                         INNER JOIN [dbo].[Dim_ClaseMovimiento] CM ON CM.idClaseMovimiento = MO.idClaseMovimiento 
                         INNER JOIN Dim_Activo A ON A.idActivo = MO.idActivo 
                         INNER JOIN Dim_Cuenta C ON C.idCuenta = MO.idCuenta 
@@ -53,7 +58,7 @@ namespace AppFinanzasWeb.Servicios
         public async Task<int> ObtenerTotalMovimientos()
         {
             using var connection = new SqlConnection(connectionString);
-            var sql = "SELECT COUNT(*) FROM Fact_Movimiento WHERE idClaseMovimiento IS NOT NULL";
+            var sql = "SELECT COUNT(*) FROM Fact_Movimiento2 WHERE idClaseMovimiento IS NOT NULL";
             return await connection.ExecuteScalarAsync<int>(sql);
         }
 
@@ -61,15 +66,76 @@ namespace AppFinanzasWeb.Servicios
         {
             using var conection = new SqlConnection(connectionString);
 
-            var sql = "SELECT ISNULL(MAX(idMovimiento), 0) FROM Fact_Movimiento";
+            var sql = "SELECT ISNULL(MAX(idMovimiento), 0) FROM Fact_Movimiento2";
             return await conection.ExecuteScalarAsync<int>(sql);
         }
 
         public async Task InsertarMovimiento(Movimiento movimiento)
         {
-            using var connection  = new SqlConnection(connectionString);
+            using var connection = new SqlConnection(connectionString);
 
-            var sql = @"INSERT INTO Fact_Movimiento (IdMovimiento)"
+            string sqlPrecioCotiz;
+
+            if (movimiento.PrecioCotiz!= 0)
+            {
+                if (movimiento.ActivoNombre == "Peso Argentino")
+                {
+                    sqlPrecioCotiz = movimiento.PrecioCotiz.ToString();
+                }
+                else
+                {
+                    sqlPrecioCotiz = Convert.ToString(1 / movimiento.PrecioCotiz);
+                }
+            }
+            else
+            {
+                sqlPrecioCotiz = "(SELECT TOP 1 VALOR FROM [dbo].[Cotizacion_Activo] CA WHERE IDACTIVOCOMP = " +
+                        "" + movimiento.IdActivo + " AND IDFECHA <= " + movimiento.Fecha.ToString("yyyyMMdd") + " " +
+                        "ORDER BY idFecha DESC)";
+            }
+
+            string fecha = movimiento.Fecha.ToString("yyyyMMdd");
+
+            var sql = "INSERT INTO Fact_Movimiento2 (IdMovimiento, idCuenta, idActivo, idFecha, tipoMovimiento, " +
+                       " idClaseMovimiento, comentario, monto, precioCotiz) VALUES (@IdMovimiento, @IdCuenta, @IdActivo, " + fecha  + " , " + 
+                       " @TipoMovimiento, @IdClaseMovimiento, @Comentario, @Monto, " + sqlPrecioCotiz + ")";
+
+            await connection.ExecuteAsync(sql, movimiento);
+
         }
+        
+        public async Task Borrar(int id)
+        {
+            using var connection = new SqlConnection(connectionString);
+            await connection.ExecuteAsync("DELETE FROM Fact_Movimiento2 WHERE idMovimiento = @Id", new {id});
+
+        }
+
+        public async Task<Movimiento> ObtenerPorId(int id)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            return await connection.QueryFirstOrDefaultAsync<Movimiento>(@"SELECT  
+	                                                                    FM.IdMovimiento IdMovimiento, 
+	                                                                    C.IdCuenta IdCuenta,
+	                                                                    C.nombre CuentaNombre,
+	                                                                    A.idActivo IdActivo,
+	                                                                    A.nombre ActivoNombre,
+	                                                                    T.idFecha IdFecha,
+	                                                                    T.fecha Fecha,
+	                                                                    FM.tipoMovimiento TipoMovimiento,
+	                                                                    FM.idClaseMovimiento IdClaseMovimiento,
+	                                                                    CM.descripcion ClaseMovimientoNombre,
+	                                                                    FM.comentario Comentario,
+	                                                                    FM.Monto Monto, 
+	                                                                    FM.precioCotiz PrecioCotiz
+                                                                    FROM [dbo].[Fact_Movimiento2] FM
+                                                                    INNER JOIN [dbo].[Dim_Activo] A ON A.idActivo = FM.idActivo
+                                                                    INNER JOIN [dbo].[Dim_Cuenta] C ON C.idCuenta = FM.idCuenta
+                                                                    INNER JOIN [dbo].[Dim_Tiempo] T ON T.idFecha = FM.idFecha
+                                                                    LEFT JOIN [dbo].[Dim_ClaseMovimiento] CM ON CM.idClaseMovimiento = FM.idClaseMovimiento
+                                                                    WHERE FM.idMovimiento = @Id
+                                                                    ", new { id });
+            }
     }
 }

@@ -17,7 +17,9 @@ namespace AppFinanzasWeb.ViewModels
 
         public int? IdCuentaEgreso { get; set; } // Solo para Egreso e Intercambio
 
-        public int? IdClaseMovimiento { get; set; } // Solo para Ingreso y Egreso
+        public int? IdClaseIngreso { get; set; } // Solo para Ingreso y Egreso
+
+        public int? IdClaseEgreso { get; set; } // Solo para Ingreso y Egreso
 
         [Required]
         public string Detalle { get; set; }
