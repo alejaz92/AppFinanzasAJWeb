@@ -27,6 +27,7 @@ namespace AppFinanzasWeb.Models
         public string Comentario { get; set; }
         [Required(ErrorMessage = "El campo {0} es requerido")]
         public decimal Monto { get; set; }  
+        public string MontoString { get; set; }
         public decimal PrecioCotiz {  get; set; }
 
     }

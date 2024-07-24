@@ -15,6 +15,7 @@ namespace AppFinanzasWeb.Servicios
         Task<IEnumerable<Movimiento>> ObtenerMovimientosPaginacion(int pagina, int cantidadPorPagina);
         Task<Movimiento> ObtenerPorId(int id);
         Task<int> ObtenerTotalMovimientos();
+        Task Reintegrar(int id, decimal monto);
     }
 
     public class RepositorioMovimientos : IRepositorioMovimientos
@@ -109,6 +110,14 @@ namespace AppFinanzasWeb.Servicios
             using var connection = new SqlConnection(connectionString);
             await connection.ExecuteAsync("DELETE FROM Fact_Movimiento2 WHERE idMovimiento = @Id", new {id});
 
+        }
+
+        public async Task Reintegrar(int id, decimal monto)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            await connection.ExecuteAsync("UPDATE Fact_Movimiento2 SET monto = @Monto WHERE idMovimiento = @Id",
+                    new { monto, id });
         }
 
         public async Task<Movimiento> ObtenerPorId(int id)

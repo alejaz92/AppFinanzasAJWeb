@@ -44,7 +44,7 @@
                             </a>
                             @if (movimiento.TipoMovimiento == "Egreso")
                             {
-                                <a class="btn btn-warning" title="Reintegro">
+                                <a class="btn btn-warning" title="Reintegro" asp-action="Reintegro" asp-route-id="@movimiento.IdMovimiento">
                                     <i class="bi-box-arrow-in-up-right"></i>
                                 </a>
                             }                           

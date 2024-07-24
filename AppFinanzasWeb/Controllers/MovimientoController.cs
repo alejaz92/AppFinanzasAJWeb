@@ -4,6 +4,7 @@ using AppFinanzasWeb.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using AppFinanzasWeb.ViewModels;
 using System.ClientModel.Primitives;
+using System.Globalization;
 
 
 namespace AppFinanzasWeb.Controllers
@@ -64,11 +65,78 @@ namespace AppFinanzasWeb.Controllers
                 return View(model);
             }
 
+            //decimal precioCotiz;
+
+            //if (model.IdActivo == 2)
+            //{
+            //    precioCotiz = 1; 
+            //}
+            //else
+            //{
+            //    precioCotiz = 0;
+            //}
+
+            //var idMovimiento = await repositorioMovimientos.ObtenerIdMaximo() + 1;
+
+            //if (model.TipoMovimiento == "Intercambio")
+            //{
+            //    await repositorioMovimientos.InsertarMovimiento(new Movimiento
+            //    {
+            //        IdMovimiento = idMovimiento,
+            //        IdCuenta = (int)model.IdCuentaIngreso,
+            //        IdActivo = model.IdActivo,
+            //        TipoMovimiento = model.TipoMovimiento,
+            //        IdClaseMovimiento = null,
+            //        Comentario = model.Detalle,
+            //        Monto = model.Monto,
+            //        Fecha = model.Fecha,
+            //        PrecioCotiz = precioCotiz
+            //    });
+
+            //    await repositorioMovimientos.InsertarMovimiento(new Movimiento
+            //    {
+            //        IdMovimiento = idMovimiento,
+            //        IdCuenta = (int)model.IdCuentaEgreso,
+            //        IdActivo = model.IdActivo,
+            //        TipoMovimiento = model.TipoMovimiento,
+            //        IdClaseMovimiento = null,
+            //        Comentario = model.Detalle,
+            //        Monto = -model.Monto,
+            //        Fecha = model.Fecha,
+            //        PrecioCotiz = precioCotiz
+            //    });
+            //}
+            //else
+            //{
+            //    decimal monto = model.TipoMovimiento == "Egreso" ? -model.Monto : model.Monto;
+
+            //    await repositorioMovimientos.InsertarMovimiento(new Movimiento
+            //    {
+            //        IdMovimiento = idMovimiento,
+            //        IdCuenta = model.TipoMovimiento == "Ingreso" ? (int)model.IdCuentaIngreso : (int)model.IdCuentaEgreso,
+            //        IdActivo = model.IdActivo,
+            //        IdClaseMovimiento = model.TipoMovimiento == "Ingreso" ? (int)model.IdClaseIngreso : (int)model.IdClaseEgreso,
+            //        TipoMovimiento = model.TipoMovimiento,
+            //        Comentario = model.Detalle,
+            //        Monto = monto,
+            //        Fecha = model.Fecha,
+            //        PrecioCotiz = precioCotiz
+            //    });
+            //}
+
+            await InsertarMovimiento(model);
+
+            TempData["SuccessMessage"] = "Movimiento registrado con éxito.";
+            return RedirectToAction(nameof(Crear));
+        }
+
+        public async Task InsertarMovimiento (MovimientoViewModel model)
+        {
             decimal precioCotiz;
 
             if (model.IdActivo == 2)
             {
-                precioCotiz = 1; 
+                precioCotiz = 1;
             }
             else
             {
@@ -122,9 +190,6 @@ namespace AppFinanzasWeb.Controllers
                     PrecioCotiz = precioCotiz
                 });
             }
-
-            TempData["SuccessMessage"] = "Movimiento registrado con éxito.";
-            return RedirectToAction(nameof(Crear));
         }
 
         public async Task<IActionResult> Borrar(int id)
@@ -148,10 +213,15 @@ namespace AppFinanzasWeb.Controllers
         }
 
         [HttpGet]
-
         public async Task<IActionResult> Reintegro(int id)
         {
             var movimiento = await repositorioMovimientos.ObtenerPorId(id);
+
+            movimiento.Monto = Math.Abs(movimiento.Monto);
+
+  
+
+            movimiento.MontoString = movimiento.Monto.ToString("$ #,##0.00", new System.Globalization.CultureInfo("es-ES"));
 
             var cuentas = await repositorioCuentas.ObtenerPorTipo("Moneda");
 
@@ -160,7 +230,7 @@ namespace AppFinanzasWeb.Controllers
                 return RedirectToAction("NoEncontrado", "Home");
             }
 
-            ViewBag.Cuentas = cuentas;
+            ViewBag.Cuentas = new SelectList(cuentas,"Id", "CuentaNombre");
 
             var viewModel = new MovimientoReintegroViewModel
             {
@@ -168,6 +238,34 @@ namespace AppFinanzasWeb.Controllers
             };
 
             return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Reintegro(MovimientoReintegroViewModel reintegroVM)
+        {
+            var movimientoOrig = await repositorioMovimientos.ObtenerPorId(reintegroVM.movimiento.IdMovimiento);
+
+            if (movimientoOrig is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            decimal montoNuevo = -(movimientoOrig.Monto - reintegroVM.montoReint);
+
+            await repositorioMovimientos.Reintegrar(movimientoOrig.IdMovimiento, montoNuevo);
+
+            if (movimientoOrig.IdCuenta != reintegroVM.cuentaReint)
+            {
+                MovimientoViewModel nuevoMovimiento = new MovimientoViewModel
+                {
+                    
+                    //continuar armando el viewmodel con los datos correspondientes
+                };
+
+                await this.Crear(nuevoMovimiento);
+            }
+
+            return View(movimientoOrig);
         }
     }
 }
