@@ -41,6 +41,11 @@
             </div>
             
             <div class="col-md-6">
+
+                <div class="form-group">
+                    <label class="form-label">Fecha Reintegro</label>
+                    <input type="date" asp-for="fechaReint" class="form-control mb-3" value="movimiento.Fecha"/>
+                </div>
                 <div class="form-group">
                     <label class="form-label">Cuenta Devolución</label>
                     <select class="form-control mb-3" asp-for="cuentaReint" class="form-control mb-3" asp-items="ViewBag.Cuentas"

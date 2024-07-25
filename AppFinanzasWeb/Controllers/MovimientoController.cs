@@ -65,65 +65,6 @@ namespace AppFinanzasWeb.Controllers
                 return View(model);
             }
 
-            //decimal precioCotiz;
-
-            //if (model.IdActivo == 2)
-            //{
-            //    precioCotiz = 1; 
-            //}
-            //else
-            //{
-            //    precioCotiz = 0;
-            //}
-
-            //var idMovimiento = await repositorioMovimientos.ObtenerIdMaximo() + 1;
-
-            //if (model.TipoMovimiento == "Intercambio")
-            //{
-            //    await repositorioMovimientos.InsertarMovimiento(new Movimiento
-            //    {
-            //        IdMovimiento = idMovimiento,
-            //        IdCuenta = (int)model.IdCuentaIngreso,
-            //        IdActivo = model.IdActivo,
-            //        TipoMovimiento = model.TipoMovimiento,
-            //        IdClaseMovimiento = null,
-            //        Comentario = model.Detalle,
-            //        Monto = model.Monto,
-            //        Fecha = model.Fecha,
-            //        PrecioCotiz = precioCotiz
-            //    });
-
-            //    await repositorioMovimientos.InsertarMovimiento(new Movimiento
-            //    {
-            //        IdMovimiento = idMovimiento,
-            //        IdCuenta = (int)model.IdCuentaEgreso,
-            //        IdActivo = model.IdActivo,
-            //        TipoMovimiento = model.TipoMovimiento,
-            //        IdClaseMovimiento = null,
-            //        Comentario = model.Detalle,
-            //        Monto = -model.Monto,
-            //        Fecha = model.Fecha,
-            //        PrecioCotiz = precioCotiz
-            //    });
-            //}
-            //else
-            //{
-            //    decimal monto = model.TipoMovimiento == "Egreso" ? -model.Monto : model.Monto;
-
-            //    await repositorioMovimientos.InsertarMovimiento(new Movimiento
-            //    {
-            //        IdMovimiento = idMovimiento,
-            //        IdCuenta = model.TipoMovimiento == "Ingreso" ? (int)model.IdCuentaIngreso : (int)model.IdCuentaEgreso,
-            //        IdActivo = model.IdActivo,
-            //        IdClaseMovimiento = model.TipoMovimiento == "Ingreso" ? (int)model.IdClaseIngreso : (int)model.IdClaseEgreso,
-            //        TipoMovimiento = model.TipoMovimiento,
-            //        Comentario = model.Detalle,
-            //        Monto = monto,
-            //        Fecha = model.Fecha,
-            //        PrecioCotiz = precioCotiz
-            //    });
-            //}
-
             await InsertarMovimiento(model);
 
             TempData["SuccessMessage"] = "Movimiento registrado con éxito.";
@@ -250,22 +191,35 @@ namespace AppFinanzasWeb.Controllers
                 return RedirectToAction("NoEncontrado", "Home");
             }
 
-            decimal montoNuevo = -(movimientoOrig.Monto - reintegroVM.montoReint);
+            decimal montoNuevo = movimientoOrig.Monto + reintegroVM.montoReint;
 
             await repositorioMovimientos.Reintegrar(movimientoOrig.IdMovimiento, montoNuevo);
 
             if (movimientoOrig.IdCuenta != reintegroVM.cuentaReint)
             {
+                montoNuevo = - montoNuevo;
+
                 MovimientoViewModel nuevoMovimiento = new MovimientoViewModel
                 {
                     
                     //continuar armando el viewmodel con los datos correspondientes
+
+                    TipoMovimiento = "Intercambio",
+                    Fecha = reintegroVM.fechaReint,
+                    IdActivo = movimientoOrig.IdActivo,
+                    IdCuentaIngreso = reintegroVM.cuentaReint,
+                    IdCuentaEgreso = movimientoOrig.IdCuenta,
+                    Detalle = "Reintegro en otra Cuenta",
+                    Monto = montoNuevo
                 };
 
-                await this.Crear(nuevoMovimiento);
+                await this.InsertarMovimiento(nuevoMovimiento);
             }
 
-            return View(movimientoOrig);
+            TempData["SuccessMessage"] = "Movimiento registrado con éxito.";
+            return RedirectToAction("Index");
+
+            // return View(movimientoOrig);
         }
     }
 }
