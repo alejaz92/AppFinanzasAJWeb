@@ -193,7 +193,7 @@ namespace AppFinanzasWeb.Controllers
 
             decimal montoNuevo = movimientoOrig.Monto + reintegroVM.montoReint;
 
-            await repositorioMovimientos.Reintegrar(movimientoOrig.IdMovimiento, montoNuevo);
+            await repositorioMovimientos.Actualizar(movimientoOrig.IdMovimiento, montoNuevo);
 
             if (movimientoOrig.IdCuenta != reintegroVM.cuentaReint)
             {
@@ -220,6 +220,42 @@ namespace AppFinanzasWeb.Controllers
             return RedirectToAction("Index");
 
             // return View(movimientoOrig);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Editar(int Id)
+        {
+            var movimiento = await repositorioMovimientos.ObtenerPorId(Id);
+
+            if (movimiento is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            movimiento.Monto = Math.Round(movimiento.Monto, 2);
+            return View(movimiento);
+        }
+
+        [HttpPost] 
+        public async Task<IActionResult> Editar(Movimiento movimiento)
+        {
+            var movimientoExiste = await repositorioMovimientos.ObtenerPorId(movimiento.IdMovimiento);
+
+            if (movimientoExiste is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(movimiento);
+            }
+
+
+            await repositorioMovimientos.Actualizar(movimiento.IdMovimiento, movimiento.Monto);
+
+            return RedirectToAction("Index");
+
         }
     }
 }

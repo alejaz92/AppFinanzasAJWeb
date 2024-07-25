@@ -1,0 +1,55 @@
+﻿@model Movimiento
+
+@{
+    ViewData["title"] = "Editar Movimiento";
+}
+
+<div class="container mt-5">
+    <h1>Editar Movimiento</h1>
+
+    <form asp-action="Editar" method="post">
+        <input type="hidden" asp-for="IdMovimiento" />
+            <div>
+
+
+                <div class="form-group">
+                    <label class="form-label">Fecha</label>
+                    <input type="date" asp-for="Fecha" class="form-control mb-3" readonly />
+                </div>
+            <div class="form-group">
+                <label class="form-label">Tipo de Movimiento</label>
+                <input type="text" asp-for="TipoMovimiento" class="form-control mb-3" readonly />
+            </div>
+                <div class="form-group">
+                    <label class="form-label">Clase de Movimiento</label>
+                    <input type="text" asp-for="ClaseMovimientoNombre" class="form-control mb-3" readonly />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Detalle</label>
+                    <input type="text" asp-for="Comentario" class="form-control mb-3" readonly />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cuenta Original</label>
+                    <input type="text" asp-for="CuentaNombre" class="form-control mb-3" readonly />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Moneda</label>
+                    <input type="text" asp-for="ActivoNombre" class="form-control mb-3" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Monto</label>
+                <input type="text" asp-for="Monto" class="form-control mb-3" />
+                </div>
+
+
+                <div class="d-flex justify-content-end mt-4">
+                    <a class="btn btn-secondary" style="margin-right: 10px;" asp-action="Index">Volver</a>
+                    <button type="submit" class="btn btn-primary">Registrar</button>
+                </div>
+
+            </div>
+
+    </form>
+</div>
+

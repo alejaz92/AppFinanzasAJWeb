@@ -38,6 +38,10 @@
                         </td>
                         <td>
 
+                            <a class="btn btn-primary" asp-action="Editar" title="Editar" asp-route-id="@movimiento.IdMovimiento">
+                                <i class="bi-pencil-fill"></i>
+                            </a>
+
                             <a class="btn btn-danger" title="Borrar" onclick="openDeleteModal(@movimiento.IdMovimiento,
                             '@Url.Action("Borrar", "Movimiento")','@Url.Action("checkEsUsado", "Movimiento")')">
                                 <i class="bi-trash-fill"></i>
@@ -48,9 +52,7 @@
                                     <i class="bi-box-arrow-in-up-right"></i>
                                 </a>
                             }                           
-@*                             <a class="btn btn-primary" asp-action="Editar" title="Editar">
-                                <i class="bi-pencil-fill"></i>
-                            </a> *@                           
+                                                      
                             
                         </td>
                 
