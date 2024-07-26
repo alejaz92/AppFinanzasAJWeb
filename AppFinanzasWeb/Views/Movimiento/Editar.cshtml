@@ -39,7 +39,7 @@
 
                 <div class="form-group">
                     <label class="form-label">Monto</label>
-                <input type="text" asp-for="Monto" class="form-control mb-3" />
+                <input type="text" class="form-control mb-3" asp-for="MontoString"  id="monto" onblur="formatearMoneda(this)" />
                 </div>
 
 
@@ -52,4 +52,6 @@
 
     </form>
 </div>
+
+
 

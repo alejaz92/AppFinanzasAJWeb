@@ -24,8 +24,9 @@ namespace AppFinanzasWeb.ViewModels
         [Required]
         public string Detalle { get; set; }
 
-        [Required]
-        [Range(0.01, double.MaxValue, ErrorMessage = "El monto debe ser positivo.")]
+       
         public decimal Monto { get; set; }
+        [Required]
+        public string MontoString { get; set; }
     }
 }

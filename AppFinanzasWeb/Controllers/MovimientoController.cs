@@ -60,6 +60,8 @@ namespace AppFinanzasWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> Crear(MovimientoViewModel model)
         {
+            model.Monto = Convert.ToDecimal(model.MontoString);
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -227,6 +229,14 @@ namespace AppFinanzasWeb.Controllers
         {
             var movimiento = await repositorioMovimientos.ObtenerPorId(Id);
 
+            if (movimiento.TipoMovimiento == "Egreso")
+            {
+                movimiento.Monto = -movimiento.Monto;
+            }
+
+            movimiento.MontoString = movimiento.Monto.ToString("#,##0.00", 
+                new System.Globalization.CultureInfo("es-ES"));
+
             if (movimiento is null)
             {
                 return RedirectToAction("NoEncontrado", "Home");
@@ -244,6 +254,13 @@ namespace AppFinanzasWeb.Controllers
             if (movimientoExiste is null)
             {
                 return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            movimiento.Monto = Convert.ToDecimal(movimiento.MontoString); 
+
+            if (movimiento.TipoMovimiento == "Egreso")
+            {
+                movimiento.Monto = -movimiento.Monto;
             }
 
             if (!ModelState.IsValid)

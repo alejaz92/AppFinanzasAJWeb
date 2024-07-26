@@ -56,7 +56,7 @@
                 <div class="form-group">
                     <label class="form-label">Monto a Reintegrar</label>
                     <input class="form-control" asp-for="montoReint" class="form-control mb-3"
-                           id="montoReintegrar" type="number" value="" placeholder="$0,00" />
+                           id="montoReintegrar" type="string"  onblur="formatearMoneda(this)" onblur="chequeoMontosReint(this)"/>
                 </div>
                 <div class="d-flex justify-content-end mt-4">
                     <a class="btn btn-secondary" style="margin-right: 10px;" asp-action="Index">Volver</a>
@@ -71,41 +71,42 @@
 @section Scripts {
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const montoInicialInput = document.getElementById('montoInicial');
-            const montoReintegrarInput = document.getElementById('montoReintegrar');
+        const montoReintegrarInput = document.getElementById('montoReintegrar');
+        const montoInicialInput = document.getElementById('montoInicial');
 
-            // Función para desformatear valores de campo
-            function parseCurrency(value) {
-                return parseFloat(value.replace('$', '').replace(/\./g, '').replace(',', '.')) || 0;
+
+        montoReintegrarInput.addEventListener('blur', function () {
+            var montoReint = removePoints(montoReintegrarInput.value);
+            montoReint = montoReint.replace(',', '.');
+
+            console.log(montoReint);
+            console.log(montoInicialInput.value);
+
+            if (montoReint > montoInicialInput.value) {
+                this.setCustomValidity('El monto a reintegrar no puede ser mayor que el monto inicial.');
+                console.log('entro1')
+            } else {
+                console.log('entro2')
+                this.setCustomValidity('');
             }
-
-            // Manejar el evento input en montoReintegrar
-            montoReintegrarInput.addEventListener('input', function () {
-                const rawValue = parseCurrency(this.value);
-                const montoInicial = parseCurrency(montoInicialInput.value);
-
-                if (rawValue > montoInicial) {
-                    this.setCustomValidity('El monto a reintegrar no puede ser mayor que el monto inicial.');
-                } else {
-                    this.setCustomValidity('');
-                }
-            });
-
-            // Manejar el evento blur en montoReintegrar
-            montoReintegrarInput.addEventListener('blur', function () {
-                const rawValue = parseCurrency(this.value);
-                const montoInicial = parseCurrency(montoInicialInput.value);
-
-                if (rawValue > montoInicial) {
-                    this.setCustomValidity('El monto a reintegrar no puede ser mayor que el monto inicial.');
-                } else {
-                    this.setCustomValidity('');
-                }
-            });
-
-
-
         });
+
+        // function chequeoMontosReint(input) {
+        //     // document.addEventListener('DOMContentLoaded', function () {
+        //     const montoInicialInput = document.getElementById('montoInicial');
+        //     var montoReintegrarInput = this.input;
+
+        //     montoReintegrarInput = removePoints(montoReintegrarInput);
+        //     montoReintegrarInput = montoReintegrarInput.replace(',', '.');
+
+        //     if (montoReintegrarInput > montoInicialInput) {
+        //         this.setCustomValidity('El monto a reintegrar no puede ser mayor que el monto inicial.');
+        //     } else {
+        //         this.setCustomValidity('');
+        //     }
+        // }
+
+
+        
     </script>
 }
