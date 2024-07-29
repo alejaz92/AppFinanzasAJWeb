@@ -1,0 +1,142 @@
+﻿@model MovTarjeta
+@{
+    ViewData["title"] = "Nuevo Movimiento Tarjeta";
+}
+<h1>Nuevo Movimiento de Tarjeta</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<div asp-asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<div class="container mt-4">
+    <form asp-action="Crear" method="post">
+        <div class="form-group mb-3">
+            <label for="TipoMovimiento">Tipo de Movimiento</label>
+            <select class="form-control" asp-for="TipoMov" id="tipoMov" onchange="actualizarVisibilidadCampos()">
+                <option value="unico">Unico</option>
+                <option value="recurrente">Recurrente</option>
+            </select>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="Fecha">Fecha</label>
+            <input class="form-control" asp-for="FechaMov" type="date"/>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="Activo">Moneda</label>
+            <select asp-for="IdActivo" class="form-control">
+                @foreach (var activo in ViewBag.Activos)
+                {
+                    <option value="@activo.Id">@activo.ActivoNombre</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="Tarjeta">Tarjeta</label>
+            <select asp-for="IdTarjeta" class="form-control">
+                @foreach (var tarjeta in ViewBag.Tarjetas)
+                {
+                    <option value="@tarjeta.Id">@tarjeta.Nombre</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="ClaseMovimiento">Clase de Movimiento</label>
+            <select asp-for="IdClaseMovimiento" class="form-control">
+                @foreach (var claseMovimiento in ViewBag.ClasesMovimiento)
+                {
+                    <option value="@claseMovimiento.Id">@claseMovimiento.ClaseMovimientoNombre</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="Detalle">Detalle</label>
+            <input asp-for="Detalle" class="form-control" />
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="Monto">Monto Total</label>
+            <input asp-for="MontoTotalString" class="form-control" type="text" onblur="formatearMoneda(this)" />
+        </div>
+
+        <div class="form-group mb-3" id="cantidadCuotasDiv">
+            <label for="Cuotas">Cuotas</label>
+            <input asp-for="Cuotas" class="form-control" type="number" value="1" id="cantidadCuotas" min="1" 
+            oninput="actualizarFechaFinal()"/>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="mesPrimerCuota">Mes Primer Cuota</label>
+            <input asp-for="MesPrimerCuota" class="form-control" type="month" id="fechaInicial" oninput="actualizarFechaFinal()" />
+        </div>
+
+        <div class="form-group mb-3" id="fechaFinalDiv">
+            <label for="mesUltimaCuota">Mes Ultima Cuota</label>
+            <input asp-for="MesUltimaCuota" class="form-control" type="month" id="fechaFinal" readonly />
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function actualizarVisibilidadCampos() {
+            const tipo = document.getElementById("tipoMov").value;
+            const cantidadCuotas = document.getElementById("cantidadCuotasDiv");
+            const fechaFinal = document.getElementById("fechaFinalDiv");
+
+            console.log("algo");
+
+            if (tipo == "recurrente") {
+                cantidadCuotas.style.display = "none";
+                fechaFinal.style.display = "none";
+            } else {
+                cantidadCuotas.style.display = "block";
+                fechaFinal.style.display = "block";
+            }
+        }
+
+        function actualizarFechaFinal() {
+            const tipo = document.getElementById("tipoMov").value;
+            if (tipo === "recurrente") return;
+
+            const fechaInicial = document.getElementById("fechaInicial").value;
+            const cantidadCuotas = parseInt(document.getElementById("cantidadCuotas").value) || 1;
+            const fechaFinal = document.getElementById("fechaFinal");
+
+            const [year, month] = fechaInicial.split('-').map(Number);
+            const nuevaFecha = new Date(year, month - 1 + (cantidadCuotas - 1), 1);
+
+            const nuevoMes = nuevaFecha.getMonth() + 1;
+            const nuevoAnio = nuevaFecha.getFullYear();
+
+            fechaFinal.value = `${nuevoAnio}-${nuevoMes.toString().padStart(2, '0')}`;
+        }
+
+        function establecerFechaInicialPorDefecto() {
+            const hoy = new Date();
+            const mesSiguiente = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 1);
+            const nuevoMes = mesSiguiente.getMonth() + 1;
+            const nuevoAnio = mesSiguiente.getFullYear();
+
+            const fechaInicial = document.getElementById("fechaInicial");
+            fechaInicial.value = `${nuevoAnio}-${nuevoMes.toString().padStart(2, '0')}`;
+
+            actualizarFechaFinal();
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            establecerFechaInicialPorDefecto();
+            actualizarVisibilidadCampos();
+        });
+    </script>
+}
+

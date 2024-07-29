@@ -46,3 +46,4 @@ function removePoints(str) {
     }
     return result;
 }
+

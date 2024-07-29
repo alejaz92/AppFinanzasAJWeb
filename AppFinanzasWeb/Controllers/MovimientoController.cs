@@ -43,7 +43,6 @@ namespace AppFinanzasWeb.Controllers
             return View(viewModel);
         }
 
-        [HttpGet]
         public async Task<IActionResult> Crear()
         {
             ViewBag.Activos = await repositorioActivos.ObtenerPorTipo("Moneda");
