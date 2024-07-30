@@ -125,26 +125,26 @@ namespace AppFinanzasWeb.Servicios
             using var connection = new SqlConnection(connectionString);
 
             return await connection.QueryFirstOrDefaultAsync<Movimiento>(@"SELECT  
-	                                                                    FM.IdMovimiento IdMovimiento, 
-	                                                                    C.IdCuenta IdCuenta,
-	                                                                    C.nombre CuentaNombre,
-	                                                                    A.idActivo IdActivo,
-	                                                                    A.nombre ActivoNombre,
-	                                                                    T.idFecha IdFecha,
-	                                                                    T.fecha Fecha,
-	                                                                    FM.tipoMovimiento TipoMovimiento,
-	                                                                    FM.idClaseMovimiento IdClaseMovimiento,
-	                                                                    CM.descripcion ClaseMovimientoNombre,
-	                                                                    FM.comentario Comentario,
-	                                                                    FM.Monto Monto, 
-	                                                                    FM.precioCotiz PrecioCotiz
-                                                                    FROM [dbo].[Fact_Movimiento2] FM
-                                                                    INNER JOIN [dbo].[Dim_Activo] A ON A.idActivo = FM.idActivo
-                                                                    INNER JOIN [dbo].[Dim_Cuenta] C ON C.idCuenta = FM.idCuenta
-                                                                    INNER JOIN [dbo].[Dim_Tiempo] T ON T.idFecha = FM.idFecha
-                                                                    LEFT JOIN [dbo].[Dim_ClaseMovimiento] CM ON CM.idClaseMovimiento = FM.idClaseMovimiento
-                                                                    WHERE FM.idMovimiento = @Id
-                                                                    ", new { id });
+	                                                                        FM.IdMovimiento IdMovimiento, 
+	                                                                        C.IdCuenta IdCuenta,
+	                                                                        C.nombre CuentaNombre,
+	                                                                        A.idActivo IdActivo,
+	                                                                        A.nombre ActivoNombre,
+	                                                                        T.idFecha IdFecha,
+	                                                                        T.fecha Fecha,
+	                                                                        FM.tipoMovimiento TipoMovimiento,
+	                                                                        FM.idClaseMovimiento IdClaseMovimiento,
+	                                                                        CM.descripcion ClaseMovimientoNombre,
+	                                                                        FM.comentario Comentario,
+	                                                                        FM.Monto Monto, 
+	                                                                        FM.precioCotiz PrecioCotiz
+                                                                        FROM [dbo].[Fact_Movimiento2] FM
+                                                                        INNER JOIN [dbo].[Dim_Activo] A ON A.idActivo = FM.idActivo
+                                                                        INNER JOIN [dbo].[Dim_Cuenta] C ON C.idCuenta = FM.idCuenta
+                                                                        INNER JOIN [dbo].[Dim_Tiempo] T ON T.idFecha = FM.idFecha
+                                                                        LEFT JOIN [dbo].[Dim_ClaseMovimiento] CM ON CM.idClaseMovimiento = FM.idClaseMovimiento
+                                                                        WHERE FM.idMovimiento = @Id
+                                                                        ", new { id });
             }
     }
 }

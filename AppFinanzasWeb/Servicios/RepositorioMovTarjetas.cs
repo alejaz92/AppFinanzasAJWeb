@@ -6,8 +6,10 @@ namespace AppFinanzasWeb.Servicios
 {
     public interface IRepositorioMovTarjetas
     {
+        Task CerrarRecurente(int id);
         Task InsertarMovimiento(MovTarjeta movTarjeta);
         Task<IEnumerable<MovTarjeta>> ObtenerMovimientosPaginacion(int pagina, int cantidadPorPagina);
+        Task<MovTarjeta> ObtenerPorId(int id);
         Task<int> ObtenerTotalMovimientos();
     }
 
@@ -25,6 +27,7 @@ namespace AppFinanzasWeb.Servicios
             using var connection = new SqlConnection(connectionString);
 
             var sql = @"SELECT 
+                            IdMovimiento,
 	                        T1.FECHA FechaMov, 
 	                        T.nombre NombreTarj, 
 	                        CM.descripcion TipoMov, 
@@ -94,6 +97,45 @@ namespace AppFinanzasWeb.Servicios
                            ,@MontoCuota);";
 
             await connection.ExecuteAsync(sql, movTarjeta);
+        }
+
+        public async Task<MovTarjeta> ObtenerPorId(int id)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var sql = @"SELECT [idMovimiento]
+                          ,TF.idFecha IdFecha
+                          ,TF.[fecha] FechaMov
+                          ,[detalle] Detalle
+                          ,FT.idTarjeta IdTarjeta
+                          ,FT.idClaseMovimiento IdClaseMovimiento
+                          ,FT.idActivo IdActivo
+                          ,[montoTotal] MontoTotal
+                          ,[cuotas] Cuotas
+                          ,[mesPrimerCuota] IdMesPrimerCuota
+	                      ,T1.fecha MesPrimerCuota
+                          ,[mesUltimaCuota] IdMesUltimaCuota
+	                      , T2.fecha MesUltimaCuota
+                          ,[repite] Repite
+                          ,[montoCuota] MontoCuota
+	                      , T.nombre NombreTarj
+                      FROM [dbo].[Fact_Tarjetas2] FT
+                      INNER JOIN [dbo].[Dim_Tarjeta] T ON T.idTarjeta = FT.idTarjeta
+                      INNER JOIN [dbo].[Dim_ClaseMovimiento] CM ON CM.idClaseMovimiento = FT.idClaseMovimiento
+                      INNER JOIN [dbo].[Dim_Activo] A ON A.idActivo = FT.idActivo
+                      INNER JOIN [dbo].[Dim_Tiempo] TF ON TF.idFecha = FT.fechaMov
+                      INNER JOIN [dbo].[Dim_Tiempo] T1 ON T1.idFecha = FT.mesPrimerCuota
+                      INNER JOIN [dbo].[Dim_Tiempo] T2 ON T2.idFecha = FT.mesUltimaCuota
+                      WHERE idMovimiento = @Id;";
+
+            return await connection.QueryFirstOrDefaultAsync<MovTarjeta>(sql, new {id});
+        }
+
+        public async Task CerrarRecurente(int id)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            await connection.ExecuteAsync("UPDATE Fact_Tarjetas2 SET repite = 'Cerrado' WHERE IdMovimiento = @Id", new { id });
         }
     }
 }

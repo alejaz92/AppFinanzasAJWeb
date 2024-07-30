@@ -45,24 +45,14 @@
                             $@movimiento.MontoCuota.ToString("N2", new CultureInfo("es-ES"))
                         </td>
                         <td>
-
                             @if(movimiento.CuotaTexto == "Recurrente")
                             {
-                                <a class="btn btn-primary" asp-action="EditarRecurrente" title="Editar Recurrente" 
+                                <a class="btn btn-primary" asp-action="EditarRecurrente" title="EditarRecurrente" 
                                 asp-route-id="@movimiento.IdMovimiento">
                                     <i class="bi-pencil-fill"></i>
                                 </a>
                             }
-
-                            
-
-@*                             <a class="btn btn-danger" title="Borrar">
-                                <i class="bi-trash-fill"></i>
-                            </a> *@
-
-
                         </td>
-
                     </tr>
                 }
             </tbody>

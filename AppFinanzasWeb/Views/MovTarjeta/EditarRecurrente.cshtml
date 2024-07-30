@@ -1,0 +1,94 @@
+﻿@model AppFinanzasWeb.ViewModels.MovTarjetaRecurrenteViewModel
+@{
+    ViewData["title"] = "Editar Recurrente";
+}
+
+<div class="container mt-5">
+    <h1>Editar Movimiento Recurrente</h1>
+
+    <form asp-action="EditarRecurrente" method="post">
+        <input type="hidden" asp-for="MovTarjeta.IdMovimiento" />
+        <input type="hidden" asp-for="MovTarjeta.IdTarjeta" />
+        <input type="hidden" asp-for="MovTarjeta.IdClaseMovimiento" />
+        <input type="hidden" asp-for="MovTarjeta.IdActivo" />
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">Fecha</label>
+                    <input type="date" asp-for="MovTarjeta.FechaMov" class="form-control mb-3"
+                           readonly />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tarjeta</label>
+                    <input type="text" asp-for="MovTarjeta.NombreTarj" class="form-control mb-3" />
+                    <input type="hidden" asp-for="MovTarjeta.IdTarjeta" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Detalle</label>
+                    <input type="text" asp-for="MovTarjeta.Detalle" class="form-control mb-3"
+                           readonly />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Monto Actual</label>
+                    <input type="text" asp-for="MovTarjeta.MontoTotalString" class="form-control mb-3"
+                           readonly />
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">Acción</label>
+                    <select class="form-control mb-3" asp-for="Accion" class="form-control mb-3" onchange="actualizarVisibilidadCampos()">
+                        <option value="Editar">Editar</option>
+                        <option value="Cerrar">Cerrar</option>
+
+                    </select>
+                </div>
+
+                <div class="form-group" id="FechaNuevaDiv">
+                    <label class="form-label">Nueva Fecha</label>
+                    <input class="form-control" asp-for="FechaNueva" class="form-control mb-3"
+                           type="date" id="fechaNueva" />
+                </div>
+
+                <div class="form-group" id="MontoNuevoDiv">
+                    <label class="form-label">Nuevo Monto</label>
+                    <input class="form-control" asp-for="MontoNuevoString" class="form-control mb-3"
+                           id="montoNuevo" type="string" onblur="formatearMoneda(this)" />
+                </div>
+
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
+                <a class="btn btn-secondary" style="margin-right: 10px;" asp-action="Index">Volver</a>
+                <button type="submit" class="btn btn-primary">Registrar</button>
+            </div>
+
+        </div>
+
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function actualizarVisibilidadCampos() {
+            const Accion = document.getElementById("Accion").value;
+            const FechaNueva = document.getElementById("FechaNuevaDiv");
+            const MontoNuevo = document.getElementById("MontoNuevoDiv");
+
+
+            if (Accion == "Cerrar") {
+                FechaNueva.style.display = "none";
+                MontoNuevo.style.display = "none";
+            } else {
+                FechaNueva.style.display = "block";
+                MontoNuevo.style.display = "block";
+            }
+        }
+
+    </script>
+}
+

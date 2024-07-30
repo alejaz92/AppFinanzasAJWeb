@@ -159,6 +159,11 @@ namespace AppFinanzasWeb.Controllers
         {
             var movimiento = await repositorioMovimientos.ObtenerPorId(id);
 
+            if (movimiento is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
             movimiento.Monto = Math.Abs(movimiento.Monto);
 
   
@@ -167,10 +172,7 @@ namespace AppFinanzasWeb.Controllers
 
             var cuentas = await repositorioCuentas.ObtenerPorTipo("Moneda");
 
-            if (movimiento is null)
-            {
-                return RedirectToAction("NoEncontrado", "Home");
-            }
+            
 
             ViewBag.Cuentas = new SelectList(cuentas,"Id", "CuentaNombre");
 

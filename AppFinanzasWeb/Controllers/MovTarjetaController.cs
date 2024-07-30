@@ -3,6 +3,7 @@ using AppFinanzasWeb.Servicios;
 using AppFinanzasWeb.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using AppFinanzasWeb.ViewModels;
+using System.Reflection;
 
 
 namespace AppFinanzasWeb.Controllers
@@ -38,6 +39,7 @@ namespace AppFinanzasWeb.Controllers
             };
             return View(viewModel);
         }
+
 
         public async Task<IActionResult> Crear()
         {
@@ -82,6 +84,69 @@ namespace AppFinanzasWeb.Controllers
 
             TempData["SuccessMessage"] = "Movimiento registrado con éxito.";
             return RedirectToAction(nameof(Crear));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditarRecurrente(int id)
+        {
+            var movTarjeta = await repositorioMovTarjetas.ObtenerPorId(id);
+
+            if (movTarjeta is null )
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            movTarjeta.MontoTotalString = movTarjeta.MontoTotal.ToString("$ #,##0.00", new System.Globalization.CultureInfo("es-ES"));
+
+            var viewModel = new MovTarjetaRecurrenteViewModel
+            {
+                MovTarjeta = movTarjeta
+            };
+
+            return View(viewModel); 
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditarRecurrente(MovTarjetaRecurrenteViewModel recurrenteVM)
+        {
+            MovTarjeta movOriginal = await repositorioMovTarjetas.ObtenerPorId(recurrenteVM.MovTarjeta.IdMovimiento);
+
+            if(movOriginal is null )
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            if (recurrenteVM.Accion == "Cerrar")
+            {
+                await repositorioMovTarjetas.CerrarRecurente(movOriginal.IdMovimiento);
+                TempData["SuccessMessage"] = "Movimiento cerrado con éxito.";
+            }
+            else
+            {
+                DateTime mesPrimerCuota = new DateTime(recurrenteVM.FechaNueva.Value.Year, recurrenteVM.FechaNueva.Value.Month, 1);
+
+                MovTarjeta movNuevo = new MovTarjeta
+                {
+                    IdFecha = int.Parse(recurrenteVM.FechaNueva.Value.ToString("yyyyMMdd")),
+                    Detalle = recurrenteVM.MovTarjeta.Detalle,
+                    IdTarjeta = recurrenteVM.MovTarjeta.IdTarjeta,
+                    IdClaseMovimiento = recurrenteVM.MovTarjeta.IdClaseMovimiento,
+                    IdActivo = recurrenteVM.MovTarjeta.IdActivo,
+                    MontoTotal = Convert.ToDecimal(recurrenteVM.MontoNuevoString),
+                    Cuotas = 1,
+                    IdMesPrimerCuota = int.Parse(mesPrimerCuota.ToString("yyyyMMdd")),
+                    IdMesUltimaCuota = 0,
+                    Repite = "SI",
+                    MontoCuota = Convert.ToDecimal(recurrenteVM.MontoNuevoString)
+                };
+
+
+                await repositorioMovTarjetas.InsertarMovimiento(movNuevo);
+                await repositorioMovTarjetas.CerrarRecurente(movOriginal.IdMovimiento);
+                TempData["SuccessMessage"] = "Movimiento actualizado con éxito.";
+            }
+
+            return RedirectToAction("Index");
         }
     }
 }
