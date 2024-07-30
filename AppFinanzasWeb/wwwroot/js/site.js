@@ -6,7 +6,6 @@
 function formatearMoneda(input) {
     // Reemplazar punto o coma por punto para el parseo
     let valor = removePoints(input.value)
-
     valor = valor.replace(/[^0-9.,]/g, '').replace(',', '.');
 
     // Convertir el valor a número flotante
@@ -33,12 +32,21 @@ function formatearMoneda(input) {
 
 function removePoints(str) {
     //posicion del coma decimal
-    const lastIndex = str.lastIndexOf('.');
+    var lastIndex = str.lastIndexOf('.');
+
+    
+
+    if (lastIndex < str.lastIndexOf(',')) {
+
+        lastIndex = str.lastIndexOf(',');
+    }
+
+   // console.log(lastIndex);
 
     // Construye una nueva cadena con los puntos
     let result = '';
     for (let i = 0; i < str.length; i++) {
-        if (str[i] === '.' && i != lastIndex) {
+        if ((str[i] === '.' || str[i] === ',') && i != lastIndex) {
             // Omitir el punto si no es el de la antepenúltima posición
             continue;
         }

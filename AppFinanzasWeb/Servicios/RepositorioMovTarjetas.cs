@@ -6,6 +6,7 @@ namespace AppFinanzasWeb.Servicios
 {
     public interface IRepositorioMovTarjetas
     {
+        Task InsertarMovimiento(MovTarjeta movTarjeta);
         Task<IEnumerable<MovTarjeta>> ObtenerMovimientosPaginacion(int pagina, int cantidadPorPagina);
         Task<int> ObtenerTotalMovimientos();
     }
@@ -61,6 +62,38 @@ namespace AppFinanzasWeb.Servicios
                         WHERE FT.repite = 'SI' OR DATEADD(month ,1, T.FECHA) >= GETDATE()";
 
             return await connection.ExecuteScalarAsync<int>(sql);
+        }
+
+        public async Task InsertarMovimiento(MovTarjeta movTarjeta)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var sql = @"INSERT INTO [dbo].[Fact_Tarjetas2]
+                           ([fechaMov]
+                           ,[detalle]
+                           ,[idTarjeta]
+                           ,[idClaseMovimiento]
+                           ,[idActivo]
+                           ,[montoTotal]
+                           ,[cuotas]
+                           ,[mesPrimerCuota]
+                           ,[mesUltimaCuota]
+                           ,[repite]
+                           ,[montoCuota])
+                     VALUES
+                           (@IdFecha
+                           ,@Detalle
+                           ,@IdTarjeta
+                           ,@IdClaseMovimiento
+                           ,@IdActivo
+                           ,@MontoTotal
+                           ,@Cuotas
+                           ,@IdMesPrimerCuota
+                           ,@IdMesUltimaCuota
+                           ,@Repite
+                           ,@MontoCuota);";
+
+            await connection.ExecuteAsync(sql, movTarjeta);
         }
     }
 }

@@ -23,7 +23,7 @@
 
         <div class="form-group mb-3">
             <label for="Fecha">Fecha</label>
-            <input class="form-control" asp-for="FechaMov" type="date"/>
+            <input class="form-control" asp-for="FechaMov" type="date" id="fecha"/>
         </div>
 
         <div class="form-group mb-3">
@@ -81,6 +81,12 @@
             <label for="mesUltimaCuota">Mes Ultima Cuota</label>
             <input asp-for="MesUltimaCuota" class="form-control" type="month" id="fechaFinal" readonly />
         </div>
+
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Insertar</button>
+            <a class="btn btn-secondary" asp-action="Index">Volver</a>
+        </div>
+
     </form>
 </div>
 
@@ -93,7 +99,6 @@
             const cantidadCuotas = document.getElementById("cantidadCuotasDiv");
             const fechaFinal = document.getElementById("fechaFinalDiv");
 
-            console.log("algo");
 
             if (tipo == "recurrente") {
                 cantidadCuotas.style.display = "none";
@@ -127,7 +132,10 @@
             const nuevoMes = mesSiguiente.getMonth() + 1;
             const nuevoAnio = mesSiguiente.getFullYear();
 
+
             const fechaInicial = document.getElementById("fechaInicial");
+
+
             fechaInicial.value = `${nuevoAnio}-${nuevoMes.toString().padStart(2, '0')}`;
 
             actualizarFechaFinal();

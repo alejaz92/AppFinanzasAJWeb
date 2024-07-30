@@ -7,6 +7,7 @@ namespace AppFinanzasWeb.Models
     public class MovTarjeta
     {
         public int IdMovimiento { get; set; }
+        public int IdFecha { get; set; }
         public DateTime FechaMov {  get; set; } 
         public string Detalle { get; set; }
         public int IdTarjeta { get; set; }

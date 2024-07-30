@@ -49,5 +49,39 @@ namespace AppFinanzasWeb.Controllers
             return View();
         }
 
+
+        [HttpPost] 
+        public async Task<IActionResult> Crear(MovTarjeta model)
+        {
+            model.MontoTotal = Convert.ToDecimal(model.MontoTotalString);
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            if(model.TipoMov == "recurrente")
+            {
+                model.Repite = "SI";
+                model.IdMesUltimaCuota = 0;
+                model.Cuotas = 1;
+                model.MontoCuota = model.MontoTotal;
+            } else
+            {
+                model.Repite = "NO";
+                model.IdMesUltimaCuota = int.Parse(model.MesUltimaCuota.ToString("yyyyMMdd"));
+                model.MontoCuota = model.MontoTotal / model.Cuotas;
+            }
+
+            model.IdFecha = int.Parse(model.FechaMov.ToString("yyyyMMdd"));
+            model.IdMesPrimerCuota = int.Parse(model.MesPrimerCuota.ToString("yyyyMMdd"));
+            
+
+
+            await repositorioMovTarjetas.InsertarMovimiento(model);
+
+            TempData["SuccessMessage"] = "Movimiento registrado con éxito.";
+            return RedirectToAction(nameof(Crear));
+        }
     }
 }
