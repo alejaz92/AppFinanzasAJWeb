@@ -9,6 +9,7 @@ namespace AppFinanzasWeb.Servicios
         Task CerrarRecurente(int id);
         Task InsertarMovimiento(MovTarjeta movTarjeta);
         Task<IEnumerable<MovTarjeta>> ObtenerMovimientosPaginacion(int pagina, int cantidadPorPagina);
+        Task<IEnumerable<MovTarjeta>> ObtenerMovimientosPago(int IdTarjeta, DateTime FechaPago);
         Task<MovTarjeta> ObtenerPorId(int id);
         Task<int> ObtenerTotalMovimientos();
     }
@@ -136,6 +137,41 @@ namespace AppFinanzasWeb.Servicios
             using var connection = new SqlConnection(connectionString);
 
             await connection.ExecuteAsync("UPDATE Fact_Tarjetas2 SET repite = 'Cerrado' WHERE IdMovimiento = @Id", new { id });
+        }
+
+        public async Task<IEnumerable<MovTarjeta>> ObtenerMovimientosPago(int IdTarjeta, DateTime FechaPago)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var sql = @"SELECT 
+	                        T1.FECHA FechaMov,
+	                        CM.descripcion TipoMov,
+	                        T.detalle Detalle, 
+	                        A.nombre NombreMoneda,
+	                        CASE WHEN T.repite = 'SI' THEN 'Recurrente' ELSE CAST(DATEDIFF(MONTH, T2.FECHA, @FechaPago) + 1 AS VARCHAR) 
+		                        + '/' + cast(T.cuotas as varchar) END CuotaTexto,
+	                        T.montoCuota MontoCuota, 
+	                        CAST(CASE WHEN A.NOMBRE = 'Peso Argentino' THEN T.montoCuota ELSE (T.montoCuota * CA.VALOR)  
+		                        END  AS DECIMAL (18, 2)) ValorPesos 
+                        FROM [dbo].[Fact_Tarjetas] T 
+                        INNER JOIN [dbo].[Dim_Activo] A ON T.idActivo = A.idActivo 
+                        INNER JOIN [dbo].[Cotizacion_Activo] CA ON CA.idActivoComp = (SELECT idActivo FROM Dim_Activo WHERE simbolo = 'ARS') AND 
+	                        CA. TIPO = 'TARJETA' AND CA.IDFECHA = (SELECT MAX(IDFECHA) FROM Cotizacion_Activo) 
+                        INNER JOIN Dim_ClaseMovimiento CM ON CM.idClaseMovimiento = T.idClaseMovimiento 
+                        INNER JOIN [dbo].[Dim_Tarjeta] TA ON T.idTarjeta = TA.idTarjeta  
+                        LEFT JOIN Pago_Tarjeta PT ON PT.idTarjeta = T.idTarjeta AND PT.fechaMes = REPLACE(@FechaPago, '-','') 
+                        INNER JOIN Dim_Tiempo T1 ON   T1.IDFECHA = T.FECHAMOV 
+                        INNER JOIN Dim_Tiempo T2 ON T2.IDFECHA = T.MESPRIMERCUOTA 
+                        INNER JOIN    Dim_Tiempo T3 ON T3.IDFECHA = T.MESULTIMACUOTA WHERE  (T3.FECHA >= @FechaPago OR T.repite = 'SI') AND 
+	                        T2.FECHA <= @FechaPago AND  TA.IdTarjeta = @IdTarjeta AND PT.idTarjeta IS NULL;";
+
+
+            return await connection.QueryAsync<MovTarjeta>(sql, new
+            {
+                IdTarjeta = IdTarjeta,
+                FechaPago = FechaPago
+            });
+
         }
     }
 }

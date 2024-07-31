@@ -1,0 +1,125 @@
+﻿@model AppFinanzasWeb.ViewModels.PagoTarjetaViewModel;
+@{
+    ViewData["title"] = "Pago de Tarjeta";
+}
+<div class="container-fluid">
+    <h1>Pago de Tarjeta</h1>
+    <div class="row">
+        <div class="col-md-3 col-sm-12 mb-3">
+            <div class=" card">
+                <div class="card-header">
+                    <h5>Complete</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="PagoTarjeta" method="post">
+
+                        <fieldset>
+                            <div class="form-group mb-3">
+                                <label for="Tarjeta">Tipo de Movimiento</label>
+                                <select class="form-control" id="Tarjeta" asp-for="IdTarjeta">
+                                    <option value="">Seleccione</option>
+                                    @foreach (var tarjeta in ViewBag.Tarjetas)
+                                    {
+                                        <option value="@tarjeta.Id">@tarjeta.Nombre</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="MesPago">Mes a Pagar</label>
+                                <input class="form-control" type="month" id="MesPago" asp-for="MesPago" />
+                            </div>
+                        </fieldset>
+                        <hr />
+                        <fieldset>
+                            <div class="form-group mb-3">
+                                <label for="Fecha">Fecha Pago</label>
+                                <input class="form-control" type="date" id="Fecha" asp-for="FechaPago" />
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                <label for="Cuenta">Cuenta</label>
+                                <select class="form-control" id="Cuenta" asp-for="Cuenta.Id">
+                                    <option value="">Seleccione</option>
+                                    @foreach (var cuenta in ViewBag.Cuentas)
+                                    {
+                                        <option value="@cuenta.Id">@cuenta.CuentaNombre</option>
+                                    }
+                                </select>
+                            </div>
+                        </fieldset>
+                        <hr />
+                        <fieldset>
+                            <div class="form-group mb-3">
+                                <label for="MonedaPago">Moneda de Pago</label>
+                                <select class="form-control" id="MonedaPago" >
+                                    <option value="">Seleccione</option>
+                                    <option value="Pesos">Pesos</option>
+                                    <option value="PesosDolar">Pesos + Dolares</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="PagoPesos">Pago en Pesos</label>
+                                <input asp-for="TotalPesosString" class="form-control" type="text" onblur="formatearMoneda(this)" />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="PagoDolares">Pago en Dolares</label>
+                                <input asp-for="TotalDolaresString" class="form-control" type="text" onblur="formatearMoneda(this)" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="GastosTarjeta">Gastos de Tarjeta</label>
+                                <input asp-for="TotalGastosString" class="form-control" type="text" onblur="formatearMoneda(this)" readonly/>
+                            </div>
+                        </fieldset>                  
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9 col-sm-12-">
+            @if(Model.MovsTarjeta.Any())
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Gastos de la Tarjeta</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Tipo Movimiento</th>
+                                        <th>Detalle</th>
+                                        <th>Moneda</th>
+                                        <th>Cuota</th>
+                                        <th>Monto Cuota</th>
+                                        <th>Valor Pesos</th>
+                                        <th>Pagar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var movimiento in Model.MovsTarjeta)
+                                    {
+                                        <tr>
+                                            <td>@movimiento.FechaMov</td>
+                                            <td>@movimiento.TipoMov</td>
+                                            <td>@movimiento.Detalle</td>
+                                            <td>@movimiento.NombreMoneda</td>
+                                            <td>@movimiento.CuotaTexto</td>
+                                            <td>@movimiento.MontoCuota</td>
+                                            <td>@movimiento.ValorPesos</td>
+                                            <td><input type="checkbox" /></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }            
+        </div>
+    </div>
+</div>

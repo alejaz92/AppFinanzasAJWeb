@@ -14,13 +14,16 @@ namespace AppFinanzasWeb.Controllers
         private readonly IRepositorioActivos repositorioActivos;
         private readonly IRepositorioClaseMovimientos repositorioClaseMovimientos;
         private readonly IRepositorioTarjetas repositorioTarjetas;
+        private readonly IRepositorioCuentas repositorioCuentas;
         public MovTarjetaController(IRepositorioMovTarjetas repositorioMovTarjetas, IRepositorioActivos repositorioActivos, 
-            IRepositorioClaseMovimientos repositorioClaseMovimientos, IRepositorioTarjetas repositorioTarjetas)
+            IRepositorioClaseMovimientos repositorioClaseMovimientos, IRepositorioTarjetas repositorioTarjetas, 
+            IRepositorioCuentas repositorioCuentas)
         {
             this.repositorioMovTarjetas = repositorioMovTarjetas;
             this.repositorioActivos = repositorioActivos;
             this.repositorioClaseMovimientos = repositorioClaseMovimientos;
             this.repositorioTarjetas = repositorioTarjetas;
+            this.repositorioCuentas = repositorioCuentas;
         }
 
         public async Task<IActionResult> Index(int pagina = 1)
@@ -147,6 +150,25 @@ namespace AppFinanzasWeb.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> PagoTarjeta(int? IdTarjeta, DateTime? MesPago)
+        {
+            ViewBag.Tarjetas = await repositorioTarjetas.Obtener();
+            ViewBag.Cuentas = await repositorioCuentas.ObtenerPorTipo("Moneda");
+
+            if (!MesPago.HasValue || !IdTarjeta.HasValue)
+            {
+                return View(new PagoTarjetaViewModel());
+            }
+
+            var movsTarjeta = await repositorioMovTarjetas.ObtenerMovimientosPago(IdTarjeta.Value, MesPago.Value);
+
+            PagoTarjetaViewModel pagoTarjetaVM = new PagoTarjetaViewModel
+            {
+
+            }
+            return View();
         }
     }
 }
