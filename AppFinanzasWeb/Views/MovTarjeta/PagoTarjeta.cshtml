@@ -1,24 +1,25 @@
 ﻿@model AppFinanzasWeb.ViewModels.PagoTarjetaViewModel;
+@using System.Globalization
 @{
     ViewData["title"] = "Pago de Tarjeta";
 }
 <div class="container-fluid">
     <h1>Pago de Tarjeta</h1>
-    <div class="row">
-        <div class="col-md-3 col-sm-12 mb-3">
-            <div class=" card">
-                <div class="card-header">
-                    <h5>Complete</h5>
-                </div>
-                <div class="card-body">
-                    <form asp-action="PagoTarjeta" method="post">
+    <form asp-action="PagoTarjeta" method="post">
+        <div class="row">
+            <div class="col-md-3 col-sm-12 mb-3">
+                <div class=" card">
+                    <div class="card-header">
+                        <h5>Complete</h5>
+                    </div>
+                    <div class="card-body">                    
 
                         <fieldset>
                             <div class="form-group mb-3">
-                                <label for="Tarjeta">Tipo de Movimiento</label>
-                                <select class="form-control" id="Tarjeta" asp-for="IdTarjeta">
+                                <label for="IdTarjeta">Tipo de Movimiento</label>
+                                <select class="form-control" id="IdTarjeta" asp-for="IdTarjeta" onchange="actualizarTablaGastos()">
                                     <option value="">Seleccione</option>
-                                    @foreach (var tarjeta in ViewBag.Tarjetas)
+                                    @foreach (var tarjeta in Model.Tarjetas)
                                     {
                                         <option value="@tarjeta.Id">@tarjeta.Nombre</option>
                                     }
@@ -27,7 +28,7 @@
 
                             <div class="form-group mb-3">
                                 <label for="MesPago">Mes a Pagar</label>
-                                <input class="form-control" type="month" id="MesPago" asp-for="MesPago" />
+                                <input class="form-control" type="month" id="MesPago" asp-for="MesPago" onchange="actualizarTablaGastos()" />
                             </div>
                         </fieldset>
                         <hr />
@@ -41,7 +42,7 @@
                                 <label for="Cuenta">Cuenta</label>
                                 <select class="form-control" id="Cuenta" asp-for="Cuenta.Id">
                                     <option value="">Seleccione</option>
-                                    @foreach (var cuenta in ViewBag.Cuentas)
+                                    @foreach (var cuenta in Model.Cuentas)
                                     {
                                         <option value="@cuenta.Id">@cuenta.CuentaNombre</option>
                                     }
@@ -52,7 +53,7 @@
                         <fieldset>
                             <div class="form-group mb-3">
                                 <label for="MonedaPago">Moneda de Pago</label>
-                                <select class="form-control" id="MonedaPago" >
+                                <select class="form-control" id="MonedaPago" onchange="actualizarGastosAdm()">
                                     <option value="">Seleccione</option>
                                     <option value="Pesos">Pesos</option>
                                     <option value="PesosDolar">Pesos + Dolares</option>
@@ -73,53 +74,130 @@
                                 <input asp-for="TotalGastosString" class="form-control" type="text" onblur="formatearMoneda(this)" readonly/>
                             </div>
                         </fieldset>                  
-                    </form>
+
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-9 col-sm-12-">
-            @if(Model.MovsTarjeta.Any())
-            {
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Gastos de la Tarjeta</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Fecha</th>
-                                        <th>Tipo Movimiento</th>
-                                        <th>Detalle</th>
-                                        <th>Moneda</th>
-                                        <th>Cuota</th>
-                                        <th>Monto Cuota</th>
-                                        <th>Valor Pesos</th>
-                                        <th>Pagar</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var movimiento in Model.MovsTarjeta)
-                                    {
-                                        <tr>
-                                            <td>@movimiento.FechaMov</td>
-                                            <td>@movimiento.TipoMov</td>
-                                            <td>@movimiento.Detalle</td>
-                                            <td>@movimiento.NombreMoneda</td>
-                                            <td>@movimiento.CuotaTexto</td>
-                                            <td>@movimiento.MontoCuota</td>
-                                            <td>@movimiento.ValorPesos</td>
-                                            <td><input type="checkbox" /></td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+            <div class="col-md-9 col-sm-12-" id="tablaGastos">
+
+@* 
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Gastos de la Tarjeta</h5>
                         </div>
-                    </div>
-                </div>
-            }            
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Tipo Movimiento</th>
+                                            <th>Detalle</th>
+                                            <th>Moneda</th>
+                                            <th>Cuota</th>
+                                            <th>Monto Cuota</th>
+                                            <th>Valor Pesos</th>
+                                            <th>Pagar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gastosTableBody">
+                                        <tr>
+                                            <td>Algo</td>
+                                            <td>Algo</td>
+                                            <td>Algo</td>
+                                            <td>Algo</td>
+                                            <td>Algo</td>
+                                            <td>Algo</td>
+                                            <td>Algo</td>
+                                            <td>Algo</td>
+                                        </tr> *@
+
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary">Registrar</button>
+                <a class="btn btn-secondary" asp-action="Index">Volver</a>
+            </div>
         </div>
-    </div>
+    </form>
 </div>
+
+@section Scripts {
+
+    <script type="text/javascript">
+        function actualizarTablaGastos() {
+
+
+            var idTarjeta = $('#IdTarjeta').val();
+            var mesPago = $('#MesPago').val();
+
+
+
+            if (idTarjeta && mesPago) {
+
+
+                $.post('@Url.Action("ActualizarGastos")', { idTarjeta: idTarjeta, mesPago: mesPago }, function (data) {
+                    var table = $('#tablaGastos');
+                    table.empty();
+
+                    var tableTotal = '';
+                    var baseTable = '<div class="card"> ' +
+                        '<div class="card-header"> ' +
+                        '<h5>Gastos de la Tarjeta </h5>' +
+                        '   </div>' +
+                        '<div class="card-body"> ' +
+                        '<div class="table-responsive">' +
+                        '   <table class="table table-bordered table-hover">' +
+                        '    <thead>' +
+                        '   <tr>' +
+                        '   <th>Fecha </th>' +
+                        '  <th> Tipo Movimiento </th>' +
+                        '   <th> Detalle </th>' +
+                        ' <th> Moneda </th>' +
+                        ' <th> Cuota </th>' +
+                        ' <th> Monto Cuota </th>' +
+                        ' <th> Valor Pesos </th>' +
+                        '     <th> Pagar </th>' +
+                        '   </tr>' +
+                        '  </thead>' +
+                        '<tbody id="gastosTableBody" >';
+
+                    tableTotal = baseTable;
+                    //table.append(baseTable);
+
+                    $.each(data, function (i, movimiento) {
+
+
+                        var row = '<tr>' +
+                            '<td>' + movimiento.fechaMov + '</td>' +
+                            '<td>' + movimiento.tipoMov + '</td>' +
+                            '<td>' + movimiento.detalle + '</td>' +
+                            '<td>' + movimiento.nombreMoneda + '</td>' +
+                            '<td>' + movimiento.cuotaTexto + '</td>' +
+                            '<td><input asp-for="MovsTarjeta[' + i + '].MontoCuota" value="' + movimiento.montoCuota + '"  class="form-control-plaintext" id="montoCuota" /> </td>' +
+                            '<td><input asp-for="Model.MovsTarjeta[' + i + '].ValorPesos" value="' + movimiento.valorPesos + '"  class="form-control-plaintext" id="valorPesos" /> </td>' +
+                            '<td><input name="Model.MovsTarjeta[' + i + '].Pagar" type="checkbox" checked /></td>' +
+                            '</tr>';
+                        tableTotal = tableTotal + row;
+
+                    });
+
+                    baseTable = '</tbody>' +
+                        '</table>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>';
+
+                    tableTotal = tableTotal + baseTable;
+
+
+                    table.append(tableTotal);
+                });
+            }
+        }
+
+
+    </script>
+    
+}

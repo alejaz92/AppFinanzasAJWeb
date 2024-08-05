@@ -53,5 +53,15 @@ function removePoints(str) {
         result += str[i];
     }
     return result;
+
+
 }
+
+function actualizarGastosAdm() {
+    var monedaPago = document.getElementById("MonedaPago");
+
+    console.log(MonedaPago.value);
+}
+
+
 

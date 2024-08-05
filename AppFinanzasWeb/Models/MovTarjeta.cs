@@ -29,10 +29,11 @@ namespace AppFinanzasWeb.Models
         public decimal MontoCuota { get; set; }
         public string CuotaTexto { get; set; }
         public decimal CuotaPesos { get; set; }
-        public string ValorPesos { get; set; }
+        public decimal ValorPesos { get; set; }
         public string TipoMov {  get; set; }
         public string NombreTarj { get; set; }
         public string UltCuotaTexto { get; set; }
+        public bool Pagar {  get; set; }
 
     }
 }

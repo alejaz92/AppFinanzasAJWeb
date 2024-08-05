@@ -152,23 +152,60 @@ namespace AppFinanzasWeb.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> PagoTarjeta(int? IdTarjeta, DateTime? MesPago)
+
+        [HttpGet]
+        public async Task<IActionResult> PagoTarjeta()
         {
-            ViewBag.Tarjetas = await repositorioTarjetas.Obtener();
-            ViewBag.Cuentas = await repositorioCuentas.ObtenerPorTipo("Moneda");
 
-            if (!MesPago.HasValue || !IdTarjeta.HasValue)
+            var movimientosVM = new PagoTarjetaViewModel
             {
-                return View(new PagoTarjetaViewModel());
+                Tarjetas = await repositorioTarjetas.Obtener(),
+                Cuentas = await repositorioCuentas.ObtenerPorTipo("Moneda"),
+                MesPago = DateTime.Now.AddMonths(-1),
+                FechaPago = DateTime.Now
+            };
+            
+
+            return View(movimientosVM);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ActualizarGastos(int idTarjeta, DateTime mesPago)
+        {
+            if (idTarjeta == 0 || mesPago == default) 
+            {
+                return RedirectToAction("NoEncontrado", "Home");
             }
 
-            var movsTarjeta = await repositorioMovTarjetas.ObtenerMovimientosPago(IdTarjeta.Value, MesPago.Value);
+            string mesPagoString = mesPago.ToString("yyyy-MM") + "-01";
 
-            PagoTarjetaViewModel pagoTarjetaVM = new PagoTarjetaViewModel
+            var movimientos = await repositorioMovTarjetas.ObtenerMovimientosPago(idTarjeta, mesPagoString);
+
+            var movsTransformados = movimientos.Select(movimiento => new
             {
+                fechaMov = movimiento.FechaMov.ToString("yyyy-MM-dd"),
+                tipoMov = movimiento.TipoMov,
+                detalle = movimiento.Detalle,
+                nombreMoneda = movimiento.NombreMoneda,
+                cuotaTexto = movimiento.CuotaTexto,
+                montoCuota = movimiento.MontoCuota,
+                valorPesos = movimiento.ValorPesos
 
+                
+            });
+
+            return Json(movsTransformados);
+        }
+
+        [HttpPost]
+        public IActionResult PagoTarjeta(PagoTarjetaViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
             }
-            return View();
+
+            return RedirectToAction("Index");
         }
     }
 }

@@ -9,7 +9,7 @@ namespace AppFinanzasWeb.Servicios
         Task CerrarRecurente(int id);
         Task InsertarMovimiento(MovTarjeta movTarjeta);
         Task<IEnumerable<MovTarjeta>> ObtenerMovimientosPaginacion(int pagina, int cantidadPorPagina);
-        Task<IEnumerable<MovTarjeta>> ObtenerMovimientosPago(int IdTarjeta, DateTime FechaPago);
+        Task<IEnumerable<MovTarjeta>> ObtenerMovimientosPago(int IdTarjeta, string FechaPago);
         Task<MovTarjeta> ObtenerPorId(int id);
         Task<int> ObtenerTotalMovimientos();
     }
@@ -139,7 +139,7 @@ namespace AppFinanzasWeb.Servicios
             await connection.ExecuteAsync("UPDATE Fact_Tarjetas2 SET repite = 'Cerrado' WHERE IdMovimiento = @Id", new { id });
         }
 
-        public async Task<IEnumerable<MovTarjeta>> ObtenerMovimientosPago(int IdTarjeta, DateTime FechaPago)
+        public async Task<IEnumerable<MovTarjeta>> ObtenerMovimientosPago(int IdTarjeta, string FechaPago)
         {
             using var connection = new SqlConnection(connectionString);
 
