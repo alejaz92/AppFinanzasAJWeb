@@ -6,6 +6,7 @@
 <div class="container-fluid">
     <h1>Pago de Tarjeta</h1>
     <form asp-action="PagoTarjeta" method="post">
+        <input type="hidden" value="@Model.Cotizacion.Valor" class="ids" id="Cotizacion" />
         <div class="row">
             <div class="col-md-3 col-sm-12 mb-3">
                 <div class=" card">
@@ -53,7 +54,7 @@
                         <fieldset>
                             <div class="form-group mb-3">
                                 <label for="MonedaPago">Moneda de Pago</label>
-                                <select class="form-control" id="MonedaPago" onchange="actualizarGastosAdm()">
+                                <select class="form-control" id="MonedaPago" onchange="visibleFields()" >
                                     <option value="">Seleccione</option>
                                     <option value="Pesos">Pesos</option>
                                     <option value="PesosDolar">Pesos + Dolares</option>
@@ -62,16 +63,16 @@
 
                             <div class="form-group mb-3">
                                 <label for="PagoPesos">Pago en Pesos</label>
-                                <input asp-for="TotalPesosString" class="form-control" type="text" onblur="formatearMoneda(this)" />
+                                <input id="TotalPesosString" asp-for="TotalPesosString" class="form-control" type="text" onblur="formatearMoneda(this)" onchange="actualizarGastosAdm()" />
                             </div>
 
-                            <div class="form-group mb-3">
+                            <div class="form-group mb-3" id="DolarField">
                                 <label for="PagoDolares">Pago en Dolares</label>
-                                <input asp-for="TotalDolaresString" class="form-control" type="text" onblur="formatearMoneda(this)" />
+                                <input id="TotalDolaresString" asp-for="TotalDolaresString" class="form-control" type="text" onblur="formatearMoneda(this)" />
                             </div>
                             <div class="form-group mb-3">
                                 <label for="GastosTarjeta">Gastos de Tarjeta</label>
-                                <input asp-for="TotalGastosString" class="form-control" type="text" onblur="formatearMoneda(this)" readonly/>
+                                <input id="TotalGastosString" asp-for="TotalGastosString" class="form-control" type="text"  readonly/>
                             </div>
                         </fieldset>                  
 
@@ -124,6 +125,8 @@
 </div>
 
 @section Scripts {
+
+    <script src="~/js/pagoTarjeta.js" asp-append-version="true"></script>
 
     <script type="text/javascript">
         function actualizarTablaGastos() {

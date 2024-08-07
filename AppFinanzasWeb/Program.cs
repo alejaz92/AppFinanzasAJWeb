@@ -12,6 +12,7 @@ builder.Services.AddTransient<IRepositorioActivos, RepositorioActivos>();
 builder.Services.AddTransient<IRepositorioClaseMovimientos, RepositorioClaseMovimientos>();
 builder.Services.AddTransient<IRepositorioMovimientos, RepositorioMovimientos>();
 builder.Services.AddTransient<IRepositorioMovTarjetas, RepositorioMovTarjetas>();
+builder.Services.AddTransient<IRepositorioCotizacionesActivos, RepositorioCotizacionActivo>();
 
 
 

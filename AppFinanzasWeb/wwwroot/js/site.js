@@ -57,11 +57,7 @@ function removePoints(str) {
 
 }
 
-function actualizarGastosAdm() {
-    var monedaPago = document.getElementById("MonedaPago");
 
-    console.log(MonedaPago.value);
-}
 
 
 

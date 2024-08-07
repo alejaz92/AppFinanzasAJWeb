@@ -15,15 +15,17 @@ namespace AppFinanzasWeb.Controllers
         private readonly IRepositorioClaseMovimientos repositorioClaseMovimientos;
         private readonly IRepositorioTarjetas repositorioTarjetas;
         private readonly IRepositorioCuentas repositorioCuentas;
+        private readonly IRepositorioCotizacionesActivos repositorioCotizacionesActivos;
         public MovTarjetaController(IRepositorioMovTarjetas repositorioMovTarjetas, IRepositorioActivos repositorioActivos, 
             IRepositorioClaseMovimientos repositorioClaseMovimientos, IRepositorioTarjetas repositorioTarjetas, 
-            IRepositorioCuentas repositorioCuentas)
+            IRepositorioCuentas repositorioCuentas, IRepositorioCotizacionesActivos repositorioCotizacionesActivos)
         {
             this.repositorioMovTarjetas = repositorioMovTarjetas;
             this.repositorioActivos = repositorioActivos;
             this.repositorioClaseMovimientos = repositorioClaseMovimientos;
             this.repositorioTarjetas = repositorioTarjetas;
             this.repositorioCuentas = repositorioCuentas;
+            this.repositorioCotizacionesActivos = repositorioCotizacionesActivos;
         }
 
         public async Task<IActionResult> Index(int pagina = 1)
@@ -157,12 +159,16 @@ namespace AppFinanzasWeb.Controllers
         public async Task<IActionResult> PagoTarjeta()
         {
 
+
+            var cotizacion = await repositorioCotizacionesActivos.GetCotizDolarTarjeta();
+
             var movimientosVM = new PagoTarjetaViewModel
             {
                 Tarjetas = await repositorioTarjetas.Obtener(),
                 Cuentas = await repositorioCuentas.ObtenerPorTipo("Moneda"),
                 MesPago = DateTime.Now.AddMonths(-1),
-                FechaPago = DateTime.Now
+                FechaPago = DateTime.Now,
+                Cotizacion = cotizacion
             };
             
 

@@ -18,5 +18,6 @@ namespace AppFinanzasWeb.ViewModels
 
         public IEnumerable<Tarjeta> Tarjetas { get; set;}   
         public IEnumerable<Cuenta> Cuentas { get; set;}
+        public CotizacionActivo Cotizacion {  get; set;}
     }
 }
