@@ -51,3 +51,22 @@ function actualizarGastosAdm() {
     formatearMoneda(gastosAdm);
 }
 
+$('form').change(function () {
+    var test = document.getElementById('gastosTable');
+    console.log(test);
+    $('#gastosTableBody tr').each(function () {
+
+
+        var fechaMov = $(this).find('td:eq(0)').text();
+        var idClaseMov = $(this).find('input[name="idClase"]').val();
+        var detalle = $(this).find('td:eq(2)').text();
+        var idActivo = $(this).find('input[name="idActivo"]').val();
+        var cuotaTexto = $(this).find('td:eq(4)').text();
+        var montoCuota = $(this).find('td:eq(5) input').text();
+        var valorPesos = $(this).find('td:eq(6) input').text();        
+        var pagar = $(this).find('input[type="checkbox"]').prop('checked');
+
+
+    });
+});
+

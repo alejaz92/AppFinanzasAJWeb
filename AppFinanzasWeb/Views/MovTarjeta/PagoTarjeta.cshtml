@@ -6,7 +6,8 @@
 <div class="container-fluid">
     <h1>Pago de Tarjeta</h1>
     <form asp-action="PagoTarjeta" method="post">
-        <input type="hidden" value="@Model.Cotizacion.Valor" class="ids" id="Cotizacion" />
+        <input type="hidden" value="@Model.Cotizacion.Valor" class="ids" id="Cotizacion" asp-for ="Cotizacion.Valor" />
+        <input type="hidden" asp-for="MovsTarjetaSerializados" id="DatosTablaSerializados" />
         <div class="row">
             <div class="col-md-3 col-sm-12 mb-3">
                 <div class=" card">
@@ -89,7 +90,7 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered table-hover">
+                                <table class="table table-bordered table-hover" id="gastosTable">
                                     <thead>
                                         <tr>
                                             <th>Fecha</th>
@@ -173,14 +174,16 @@
 
 
                         var row = '<tr>' +
+                            '<input name="idClase" type="hidden" id="idClaseMovimiento" value = "' + movimiento.idClaseMovimiento + '" />'+
+                            '<input name="idActivo" type="hidden" id="idActivo" value = "' + movimiento.idActivo + '" />' +
                             '<td>' + movimiento.fechaMov + '</td>' +
                             '<td>' + movimiento.tipoMov + '</td>' +
                             '<td>' + movimiento.detalle + '</td>' +
-                            '<td>' + movimiento.nombreMoneda + '</td>' +
+                            '<td>' + movimiento.nombreMoneda + ' <input type="hidden"  id="idActivo" value = "' + movimiento.idActivo + '" /></td>' +
                             '<td>' + movimiento.cuotaTexto + '</td>' +
-                            '<td><input asp-for="MovsTarjeta[' + i + '].MontoCuota" value="' + movimiento.montoCuota + '"  class="form-control-plaintext" id="montoCuota" /> </td>' +
-                            '<td><input asp-for="Model.MovsTarjeta[' + i + '].ValorPesos" value="' + movimiento.valorPesos + '"  class="form-control-plaintext" id="valorPesos" /> </td>' +
-                            '<td><input name="Model.MovsTarjeta[' + i + '].Pagar" type="checkbox" checked /></td>' +
+                            '<td><input  value="' + movimiento.montoCuota + '"  class="form-control-plaintext" id="montoCuota" /> </td>' +
+                            '<td><input  value="' + movimiento.valorPesos + '"  class="form-control-plaintext" id="valorPesos" /> </td>' +
+                            '<td><input type="checkbox" checked /></td>' +
                             '</tr>';
                         tableTotal = tableTotal + row;
 

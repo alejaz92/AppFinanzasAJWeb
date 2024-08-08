@@ -144,7 +144,9 @@ namespace AppFinanzasWeb.Servicios
             using var connection = new SqlConnection(connectionString);
 
             var sql = @"SELECT 
+                            A.IdActivo IdActivo,
 	                        T1.FECHA FechaMov,
+                            CM.IdClaseMovimiento IdClaseMovimiento,
 	                        CM.descripcion TipoMov,
 	                        T.detalle Detalle, 
 	                        A.nombre NombreMoneda,

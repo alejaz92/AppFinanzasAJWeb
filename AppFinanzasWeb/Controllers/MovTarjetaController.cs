@@ -195,7 +195,9 @@ namespace AppFinanzasWeb.Controllers
                 nombreMoneda = movimiento.NombreMoneda,
                 cuotaTexto = movimiento.CuotaTexto,
                 montoCuota = movimiento.MontoCuota,
-                valorPesos = movimiento.ValorPesos
+                valorPesos = movimiento.ValorPesos,
+                idActivo = movimiento.IdActivo,
+                idClaseMovimiento = movimiento.IdClaseMovimiento
 
                 
             });
