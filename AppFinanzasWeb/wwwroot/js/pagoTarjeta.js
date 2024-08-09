@@ -52,21 +52,26 @@ function actualizarGastosAdm() {
 }
 
 $('form').change(function () {
-    var test = document.getElementById('gastosTable');
-    console.log(test);
+    var datosTabla = [];
+    
     $('#gastosTableBody tr').each(function () {
 
-
-        var fechaMov = $(this).find('td:eq(0)').text();
-        var idClaseMov = $(this).find('input[name="idClase"]').val();
-        var detalle = $(this).find('td:eq(2)').text();
-        var idActivo = $(this).find('input[name="idActivo"]').val();
-        var cuotaTexto = $(this).find('td:eq(4)').text();
-        var montoCuota = $(this).find('td:eq(5) input').text();
-        var valorPesos = $(this).find('td:eq(6) input').text();        
-        var pagar = $(this).find('input[type="checkbox"]').prop('checked');
+        var rawData = {};
 
 
+        rawData.FechaMov = $(this).find('td:eq(0)').text();
+        rawData.IdClaseMovimiento = $(this).find('input[name="idClase"]').val();
+        rawData.Detalle = $(this).find('td:eq(2)').text();
+        rawData.IdActivo = $(this).find('input[name="idActivo"]').val();
+        rawData.CuotaTexto = $(this).find('td:eq(4)').text();
+        rawData.MontoCuotaString = $(this).find('td:eq(5) input').val();
+        rawData.ValorPesosString = $(this).find('td:eq(6) input').val();        
+        rawData.Pagar = $(this).find('input[type="checkbox"]').prop('checked');
+
+        datosTabla.push(rawData);
     });
+
+    var datosTablaJson = JSON.stringify(datosTabla);
+    $('#DatosTablaSerializados').val(datosTablaJson);
 });
 

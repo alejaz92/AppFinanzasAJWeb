@@ -14,7 +14,7 @@ namespace AppFinanzasWeb.ViewModels
         [Required(ErrorMessage = "El campo {0} es requerido")]
         public int IdTarjeta { get; set; }
         [Required(ErrorMessage = "El campo {0} es requerido")]
-        public Cuenta Cuenta { get; set;}
+        public int IdCuenta { get; set;}
         [Required(ErrorMessage = "El campo {0} es requerido")]
         public DateTime MesPago { get; set;}
         [Required(ErrorMessage = "El campo {0} es requerido")]

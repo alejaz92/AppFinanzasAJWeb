@@ -4,6 +4,7 @@ using AppFinanzasWeb.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using AppFinanzasWeb.ViewModels;
 using System.Reflection;
+using System.Text.Json;
 
 
 namespace AppFinanzasWeb.Controllers
@@ -189,7 +190,7 @@ namespace AppFinanzasWeb.Controllers
 
             var movsTransformados = movimientos.Select(movimiento => new
             {
-                fechaMov = movimiento.FechaMov.ToString("yyyy-MM-dd"),
+                FechaMov = movimiento.FechaMov.ToString("yyyy-MM-dd"),
                 tipoMov = movimiento.TipoMov,
                 detalle = movimiento.Detalle,
                 nombreMoneda = movimiento.NombreMoneda,
@@ -213,6 +214,7 @@ namespace AppFinanzasWeb.Controllers
                 return RedirectToAction("NoEncontrado", "Home");
             }
 
+            viewModel.MovsTarjeta = JsonSerializer.Deserialize<List<MovTarjeta>>(viewModel.MovsTarjetaSerializados);
             return RedirectToAction("Index");
         }
     }

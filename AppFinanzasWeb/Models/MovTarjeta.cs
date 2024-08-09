@@ -27,9 +27,11 @@ namespace AppFinanzasWeb.Models
         public string Repite {  get; set; }
         public string NombreMoneda { get; set; }
         public decimal MontoCuota { get; set; }
+        public string MontoCuotaString { get; set; }
         public string CuotaTexto { get; set; }
         public decimal CuotaPesos { get; set; }
         public decimal ValorPesos { get; set; }
+        public string ValorPesosString { get; set; }
         public string TipoMov {  get; set; }
         public string NombreTarj { get; set; }
         public string UltCuotaTexto { get; set; }
