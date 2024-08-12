@@ -21,8 +21,6 @@ namespace AppFinanzasWeb.ViewModels
         public DateTime FechaPago { get; set;}  
 
         public string TotalPesosString { get; set;}
-        public string? TotalDolaresString { get; set;}
-
         public string TotalGastosString { get; set;}
 
         public IEnumerable<Tarjeta> Tarjetas { get; set;}   

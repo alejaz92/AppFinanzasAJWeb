@@ -55,7 +55,7 @@
                         <fieldset>
                             <div class="form-group mb-3">
                                 <label for="MonedaPago">Moneda de Pago</label>
-                                <select class="form-control" id="MonedaPago" onchange="visibleFields()" >
+                                <select class="form-control" id="MonedaPago" >
                                     <option value="">Seleccione</option>
                                     <option value="Pesos">Pesos</option>
                                     <option value="PesosDolar">Pesos + Dolares</option>
@@ -67,10 +67,6 @@
                                 <input id="TotalPesosString" asp-for="TotalPesosString" class="form-control" type="text" onblur="formatearMoneda(this)" onchange="actualizarGastosAdm()" />
                             </div>
 
-                            <div class="form-group mb-3" id="DolarField">
-                                <label for="PagoDolares">Pago en Dolares</label>
-                                <input id="TotalDolaresString" asp-for="TotalDolaresString" class="form-control" type="text" onblur="formatearMoneda(this)" />
-                            </div>
                             <div class="form-group mb-3">
                                 <label for="GastosTarjeta">Gastos de Tarjeta</label>
                                 <input id="TotalGastosString" asp-for="TotalGastosString" class="form-control" type="text"  readonly/>
