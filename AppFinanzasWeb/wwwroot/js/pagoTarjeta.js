@@ -16,31 +16,45 @@ function actualizarGastosAdm() {
         var row = rows[i];
 
         const input = row.cells[6].querySelector('input');
-        const moneda = row.cells[3].getElementsByTagName('td')[0];
+        const moneda = row.cells[3];
 
-        console.log(moneda);
 
         var checkbox = row.cells[7].getElementsByTagName('input')[0];
 
+        
+        if (checkbox.checked && (moneda.textContent == 'Peso Argentino' || monedaPago.value == 'Pesos')) {
 
-        if (checkbox.checked) {
             if (input) {
                 var valorPesos = parseFloat(input.value);
                 total = total + valorPesos;
+
+
             }
         }      
     }
 
 
-    if (monedaPago.value === 'PesosDolar') {
+    if (monedaPago.textContent === 'PesosDolar') {
 
 
         gastosAdm.value = parseFloat(removePoints(pagoPesos.value)) - total + parseFloat(removePoints(pagoDolar.value)) * cotizacion.value;
     }
     else {
+
+        
         gastosAdm.value = parseFloat(removePoints(pagoPesos.value)) - total;       
+
     }
-    formatearMoneda(gastosAdm);
+
+    if (gastosAdm.value >= 0) {
+
+        formatearMoneda(gastosAdm);
+    } else {
+        gastosAdm.value = 'Datos Incorrectos';
+    } 
+
+
+    
 }
 
 $('form').change(function () {

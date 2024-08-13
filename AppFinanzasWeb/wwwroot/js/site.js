@@ -6,10 +6,13 @@
 function formatearMoneda(input) {
     // Reemplazar punto o coma por punto para el parseo
     let valor = removePoints(input.value)
+
     valor = valor.replace(/[^0-9.,]/g, '').replace(',', '.');
+    
 
     // Convertir el valor a número flotante
     let numero = parseFloat(valor);
+
 
 
     if (!isNaN(numero)) {
@@ -19,6 +22,7 @@ function formatearMoneda(input) {
             maximumFractionDigits: 2,
             //useGrouping: true
         });
+
 
 
         // Actualizar el valor del campo input visible

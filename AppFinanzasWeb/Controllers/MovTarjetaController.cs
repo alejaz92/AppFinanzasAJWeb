@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using AppFinanzasWeb.ViewModels;
 using System.Reflection;
 using System.Text.Json;
+using System.Globalization;
 
 
 namespace AppFinanzasWeb.Controllers
@@ -17,9 +18,11 @@ namespace AppFinanzasWeb.Controllers
         private readonly IRepositorioTarjetas repositorioTarjetas;
         private readonly IRepositorioCuentas repositorioCuentas;
         private readonly IRepositorioCotizacionesActivos repositorioCotizacionesActivos;
+        private readonly IRepositorioMovimientos repositorioMovimientos;
         public MovTarjetaController(IRepositorioMovTarjetas repositorioMovTarjetas, IRepositorioActivos repositorioActivos, 
             IRepositorioClaseMovimientos repositorioClaseMovimientos, IRepositorioTarjetas repositorioTarjetas, 
-            IRepositorioCuentas repositorioCuentas, IRepositorioCotizacionesActivos repositorioCotizacionesActivos)
+            IRepositorioCuentas repositorioCuentas, IRepositorioCotizacionesActivos repositorioCotizacionesActivos, 
+            IRepositorioMovimientos repositorioMovimientos)
         {
             this.repositorioMovTarjetas = repositorioMovTarjetas;
             this.repositorioActivos = repositorioActivos;
@@ -27,6 +30,7 @@ namespace AppFinanzasWeb.Controllers
             this.repositorioTarjetas = repositorioTarjetas;
             this.repositorioCuentas = repositorioCuentas;
             this.repositorioCotizacionesActivos = repositorioCotizacionesActivos;
+            this.repositorioMovimientos = repositorioMovimientos;
         }
 
         public async Task<IActionResult> Index(int pagina = 1)
@@ -207,7 +211,7 @@ namespace AppFinanzasWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult PagoTarjeta(PagoTarjetaViewModel viewModel)
+        public async Task<IActionResult> PagoTarjeta(PagoTarjetaViewModel viewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -215,6 +219,47 @@ namespace AppFinanzasWeb.Controllers
             }
 
             viewModel.MovsTarjeta = JsonSerializer.Deserialize<List<MovTarjeta>>(viewModel.MovsTarjetaSerializados);
+
+            var idMovimiento = await repositorioMovimientos.ObtenerIdMaximo() + 1;
+
+            foreach(MovTarjeta movTarjeta in viewModel.MovsTarjeta)
+            {
+                if(movTarjeta.Pagar)
+                {
+                    
+                    Movimiento movimiento = new Movimiento
+                    {
+                        IdMovimiento = idMovimiento,
+                        IdCuenta = (int)viewModel.IdCuenta,
+                        TipoMovimiento = "Egreso",
+                        IdClaseMovimiento = movTarjeta.IdClaseMovimiento,
+                        Comentario = "(Tarjeta | " + movTarjeta.CuotaTexto + ") " + movTarjeta.Detalle,
+
+                    };
+
+                    if (viewModel.MonedaPago == "Pesos")
+                    {
+                        movimiento.IdActivo = 1;
+                        movimiento.Monto = Convert.ToDecimal(movTarjeta.ValorPesosString, CultureInfo.InvariantCulture);
+                    }
+                    else
+                    {
+                        movimiento.IdActivo = movTarjeta.IdActivo;
+                        movimiento.Monto = Convert.ToDecimal(movTarjeta.MontoCuotaString, CultureInfo.InvariantCulture);
+                    }
+                    if (movTarjeta.NombreMoneda == "Peso Argentino")
+                    {
+                        movimiento.PrecioCotiz = Convert.ToDecimal(viewModel.Cotizacion);
+                    }
+                    else
+                    {
+                        movimiento.PrecioCotiz = 1;
+                    }
+
+                    await repositorioMovimientos.InsertarMovimiento(movimiento);
+                    idMovimiento++;
+                }
+            }
             return RedirectToAction("Index");
         }
     }

@@ -55,7 +55,7 @@
                         <fieldset>
                             <div class="form-group mb-3">
                                 <label for="MonedaPago">Moneda de Pago</label>
-                                <select class="form-control" id="MonedaPago" >
+                                <select class="form-control" id="MonedaPago" onchange="actualizarGastosAdm()" asp-for="MonedaPago">
                                     <option value="">Seleccione</option>
                                     <option value="Pesos">Pesos</option>
                                     <option value="PesosDolar">Pesos + Dolares</option>
@@ -175,11 +175,11 @@
                             '<td>' + movimiento.fechaMov + '</td>' +
                             '<td>' + movimiento.tipoMov + '</td>' +
                             '<td>' + movimiento.detalle + '</td>' +
-                            '<td>' + movimiento.nombreMoneda + ' <input type="hidden"  id="idActivo" value = "' + movimiento.idActivo + '" /></td>' +
+                            '<td>'+ movimiento.nombreMoneda +'<input type="hidden"  id="idActivo" value = "' + movimiento.idActivo + '"/></td>' +
                             '<td>' + movimiento.cuotaTexto + '</td>' +
                             '<td><input  value="' + movimiento.montoCuota + '"  class="form-control-plaintext" id="montoCuota" /> </td>' +
                             '<td><input  value="' + movimiento.valorPesos + '"  class="form-control-plaintext" id="valorPesos" /> </td>' +
-                            '<td><input type="checkbox" checked /></td>' +
+                            '<td><input type="checkbox" checked onchange="actualizarGastosAdm()"/></td>' +
                             '</tr>';
                         tableTotal = tableTotal + row;
 
