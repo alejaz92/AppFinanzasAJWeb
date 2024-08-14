@@ -4,6 +4,7 @@ using Microsoft.Data.SqlClient;
 using System.Data.Common;
 using System.Data.SqlTypes;
 using Microsoft.Identity.Client;
+using System.Globalization;
 
 namespace AppFinanzasWeb.Servicios
 {
@@ -81,11 +82,11 @@ namespace AppFinanzasWeb.Servicios
             {
                 if (movimiento.ActivoNombre == "Peso Argentino")
                 {
-                    sqlPrecioCotiz = movimiento.PrecioCotiz.ToString();
+                    sqlPrecioCotiz = Convert.ToString(movimiento.PrecioCotiz, CultureInfo.InvariantCulture);
                 }
                 else
                 {
-                    sqlPrecioCotiz = Convert.ToString(1 / movimiento.PrecioCotiz);
+                    sqlPrecioCotiz = Convert.ToString(1 / movimiento.PrecioCotiz, CultureInfo.InvariantCulture);
                 }
             }
             else

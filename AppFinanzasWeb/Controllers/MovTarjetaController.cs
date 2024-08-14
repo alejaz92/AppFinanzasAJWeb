@@ -19,10 +19,11 @@ namespace AppFinanzasWeb.Controllers
         private readonly IRepositorioCuentas repositorioCuentas;
         private readonly IRepositorioCotizacionesActivos repositorioCotizacionesActivos;
         private readonly IRepositorioMovimientos repositorioMovimientos;
+        private readonly IRepositorioPagosTarjeta repositorioPagosTarjeta;
         public MovTarjetaController(IRepositorioMovTarjetas repositorioMovTarjetas, IRepositorioActivos repositorioActivos, 
             IRepositorioClaseMovimientos repositorioClaseMovimientos, IRepositorioTarjetas repositorioTarjetas, 
             IRepositorioCuentas repositorioCuentas, IRepositorioCotizacionesActivos repositorioCotizacionesActivos, 
-            IRepositorioMovimientos repositorioMovimientos)
+            IRepositorioMovimientos repositorioMovimientos, IRepositorioPagosTarjeta repositorioPagosTarjeta)
         {
             this.repositorioMovTarjetas = repositorioMovTarjetas;
             this.repositorioActivos = repositorioActivos;
@@ -31,6 +32,7 @@ namespace AppFinanzasWeb.Controllers
             this.repositorioCuentas = repositorioCuentas;
             this.repositorioCotizacionesActivos = repositorioCotizacionesActivos;
             this.repositorioMovimientos = repositorioMovimientos;
+            this.repositorioPagosTarjeta = repositorioPagosTarjeta;
         }
 
         public async Task<IActionResult> Index(int pagina = 1)
@@ -218,9 +220,19 @@ namespace AppFinanzasWeb.Controllers
                 return RedirectToAction("NoEncontrado", "Home");
             }
 
+
             viewModel.MovsTarjeta = JsonSerializer.Deserialize<List<MovTarjeta>>(viewModel.MovsTarjetaSerializados);
 
+            ClaseMovimiento claseGastoTarjeta = await repositorioClaseMovimientos.ObtenerPorDescripcion("Gastos Tarjeta");
+            Tarjeta tarjeta = await repositorioTarjetas.ObtenerPorId(viewModel.IdTarjeta);
+            Activo activoPesos = await repositorioActivos.ObtenerPorNombre("Peso Argentino");
+
             var idMovimiento = await repositorioMovimientos.ObtenerIdMaximo() + 1;
+
+            if(claseGastoTarjeta is null || tarjeta is null || activoPesos is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
 
             foreach(MovTarjeta movTarjeta in viewModel.MovsTarjeta)
             {
@@ -234,25 +246,31 @@ namespace AppFinanzasWeb.Controllers
                         TipoMovimiento = "Egreso",
                         IdClaseMovimiento = movTarjeta.IdClaseMovimiento,
                         Comentario = "(Tarjeta | " + movTarjeta.CuotaTexto + ") " + movTarjeta.Detalle,
+                        Fecha = viewModel.MesPago,
+                        
 
                     };
 
                     if (viewModel.MonedaPago == "Pesos")
                     {
-                        movimiento.IdActivo = 1;
+                        movimiento.ActivoNombre = activoPesos.ActivoNombre;
+                        movimiento.IdActivo = activoPesos.Id;
                         movimiento.Monto = Convert.ToDecimal(movTarjeta.ValorPesosString, CultureInfo.InvariantCulture);
                     }
                     else
                     {
+                        movimiento.ActivoNombre = movTarjeta.NombreMoneda;
                         movimiento.IdActivo = movTarjeta.IdActivo;
                         movimiento.Monto = Convert.ToDecimal(movTarjeta.MontoCuotaString, CultureInfo.InvariantCulture);
                     }
                     if (movTarjeta.NombreMoneda == "Peso Argentino")
                     {
-                        movimiento.PrecioCotiz = Convert.ToDecimal(viewModel.Cotizacion);
+                        
+                        movimiento.PrecioCotiz = Convert.ToDecimal(viewModel.Cotizacion.Valor);
                     }
                     else
                     {
+                        
                         movimiento.PrecioCotiz = 1;
                     }
 
@@ -260,6 +278,41 @@ namespace AppFinanzasWeb.Controllers
                     idMovimiento++;
                 }
             }
+
+            // gastos tarjeta
+
+            
+
+            if (Convert.ToDecimal(viewModel.TotalGastosString) != 0)
+            {
+                Movimiento movimiento = new Movimiento
+                {
+                    IdMovimiento = idMovimiento,
+                    IdCuenta = viewModel.IdCuenta,
+                    TipoMovimiento = "Egreso",
+                    IdClaseMovimiento = claseGastoTarjeta.Id,
+                    Comentario = "Gastos Tarjeta - " + tarjeta.Nombre,
+                    Fecha = viewModel.FechaPago,
+                    IdActivo = activoPesos.Id,
+                    ActivoNombre = activoPesos.ActivoNombre,
+                    Monto = Convert.ToDecimal(viewModel.TotalGastosString),
+                    PrecioCotiz = Convert.ToDecimal(viewModel.Cotizacion.Valor)
+                };
+
+                await repositorioMovimientos.InsertarMovimiento (movimiento);
+            }
+
+            //registrar el pago
+
+            PagoTarjeta pagoTarjeta = new PagoTarjeta
+            {
+                IdTarjeta = viewModel.IdTarjeta,
+                FechaMes = viewModel.MesPago.ToString("yyyyMMdd")
+            };
+
+            await repositorioPagosTarjeta.InsertarPago (pagoTarjeta);
+
+            TempData["SuccessMessage"] = "Pago Tarjeta registrado con éxito.";
             return RedirectToAction("Index");
         }
     }

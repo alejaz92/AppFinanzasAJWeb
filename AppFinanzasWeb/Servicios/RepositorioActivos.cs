@@ -15,6 +15,7 @@ namespace AppFinanzasWeb.Servicios
         Task Borrar(int id);
         Task<bool> EsUsado(int id);
         Task<IEnumerable<Activo>> ObtenerPorTipo(string nombreTipo);
+        Task<Activo> ObtenerPorNombre(string Nombre);
     }
     public class RepositorioActivos : IRepositorioActivos
     {
@@ -58,6 +59,17 @@ namespace AppFinanzasWeb.Servicios
                                                                      FROM Dim_Activo
                                                                      WHERE idActivo = @Id",
                                                                      new { Id });
+        }
+
+        public async Task<Activo> ObtenerPorNombre(string Nombre)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            return await connection.QueryFirstOrDefaultAsync<Activo>(@"
+                                                                     SELECT idActivo Id, Nombre ActivoNombre, SIMBOLO, IDTIPOACTIVO
+                                                                     FROM Dim_Activo
+                                                                     WHERE Nombre = @Nombre",
+                                                                     new { Nombre });
         }
 
         public async Task Actualizar(Activo activo)

@@ -73,6 +73,7 @@ $('form').change(function () {
         rawData.MontoCuotaString = $(this).find('td:eq(5) input').val();
         rawData.ValorPesosString = $(this).find('td:eq(6) input').val();        
         rawData.Pagar = $(this).find('input[type="checkbox"]').prop('checked');
+        rawData.NombreMoneda = $(this).find('td:eq(3)').text(); 
 
         datosTabla.push(rawData);
     });
@@ -80,4 +81,17 @@ $('form').change(function () {
     var datosTablaJson = JSON.stringify(datosTabla);
     $('#DatosTablaSerializados').val(datosTablaJson);
 });
+
+function validarForm() {
+    const gastosAdm = document.getElementById('TotalGastosString');
+
+    console.log(gastosAdm);
+
+    if (gastosAdm.value == 'Datos Incorrectos') {
+        alert('Los valores ingresados no son correctos.');
+        return false;
+    }
+
+    return false;
+}
 

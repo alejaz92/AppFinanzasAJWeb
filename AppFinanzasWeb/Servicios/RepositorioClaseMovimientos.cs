@@ -13,6 +13,7 @@ namespace AppFinanzasWeb.Servicios
         Task<bool> EsUsado(int id);
         Task<bool> Existe(string descripcion);
         Task<IEnumerable<ClaseMovimiento>> Obtener();
+        Task<ClaseMovimiento> ObtenerPorDescripcion(string Descripcion);
         Task<ClaseMovimiento> ObtenerPorId(int Id);
     }
 
@@ -57,6 +58,17 @@ namespace AppFinanzasWeb.Servicios
                                                                      FROM Dim_ClaseMovimiento
                                                                      WHERE idClaseMovimiento = @Id",
                                                                      new { Id });
+        }
+
+        public async Task<ClaseMovimiento> ObtenerPorDescripcion(string Descripcion)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            return await connection.QueryFirstOrDefaultAsync<ClaseMovimiento>(@"
+                                                                     SELECT idClaseMovimiento Id, Descripcion ClaseMovimientoNombre, IngEgr
+                                                                     FROM Dim_ClaseMovimiento
+                                                                     WHERE descripcion = @Descripcion",
+                                                                     new { Descripcion });
         }
 
         public async Task<bool> Existe(string descripcion)
