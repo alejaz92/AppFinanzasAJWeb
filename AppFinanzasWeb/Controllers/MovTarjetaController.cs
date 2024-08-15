@@ -256,23 +256,26 @@ namespace AppFinanzasWeb.Controllers
                         movimiento.ActivoNombre = activoPesos.ActivoNombre;
                         movimiento.IdActivo = activoPesos.Id;
                         movimiento.Monto = Convert.ToDecimal(movTarjeta.ValorPesosString, CultureInfo.InvariantCulture);
+                        movimiento.PrecioCotiz = Convert.ToDecimal(viewModel.Cotizacion.Valor);
                     }
                     else
                     {
                         movimiento.ActivoNombre = movTarjeta.NombreMoneda;
                         movimiento.IdActivo = movTarjeta.IdActivo;
                         movimiento.Monto = Convert.ToDecimal(movTarjeta.MontoCuotaString, CultureInfo.InvariantCulture);
+
+                        if (movTarjeta.NombreMoneda == "Peso Argentino")
+                        {
+
+                            movimiento.PrecioCotiz = Convert.ToDecimal(viewModel.Cotizacion.Valor);
+                        }
+                        else
+                        {
+
+                            movimiento.PrecioCotiz = 1;
+                        }
                     }
-                    if (movTarjeta.NombreMoneda == "Peso Argentino")
-                    {
-                        
-                        movimiento.PrecioCotiz = Convert.ToDecimal(viewModel.Cotizacion.Valor);
-                    }
-                    else
-                    {
-                        
-                        movimiento.PrecioCotiz = 1;
-                    }
+                    
 
                     await repositorioMovimientos.InsertarMovimiento(movimiento);
                     idMovimiento++;

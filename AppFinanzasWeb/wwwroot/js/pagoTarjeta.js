@@ -1,4 +1,61 @@
 ﻿
+function algo() {
+    
+    const tarjeta = document.getElementById('IdTarjeta'); 
+    if (tarjeta.value == "") {
+        alert('Seleccione una tarjeta de credito.');
+        return false;
+    }
+
+    //revisar tabla
+    var tabla = document.getElementById('gastosTableBody');
+    var rows = tabla.getElementsByTagName('tr');
+    var selectedFlag = false;
+
+    for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        var checkbox = row.cells[7].getElementsByTagName('input')[0];
+        
+        if (checkbox.checked) {
+            selectedFlag = true;
+            break;
+        }
+    }
+
+    if (!selectedFlag) {
+        alert('Debes seleccionar al menos un gasto para pagar');
+        return false;
+    }
+
+    const cuenta = document.getElementById('Cuenta');
+    if (cuenta.value == "") {
+        alert('Seleccione una cuenta.');
+        return false;
+    }
+
+
+    // moneda pago
+    const monedaPago = document.getElementById('MonedaPago');
+    if (monedaPago.value == '') {
+        alert('Seleccione una moneda para el pago.');
+        return false;
+    }
+
+    // TotalPesosString
+    const totalPesos = document.getElementById('TotalPesosString');
+    if (totalPesos.value == '') {
+        alert('Ingrese un monto para el pago.');
+        return false;
+    }
+
+    const gastosAdm = document.getElementById('TotalGastosString');
+    if (gastosAdm.value == 'Datos Incorrectos') {
+        alert('Los valores ingresados no son correctos.');
+        return false;
+    }
+    return true;
+}
+
 function actualizarGastosAdm() {
     var monedaPago = document.getElementById('MonedaPago');
     var pagoPesos = document.getElementById('TotalPesosString');
@@ -51,10 +108,7 @@ function actualizarGastosAdm() {
         formatearMoneda(gastosAdm);
     } else {
         gastosAdm.value = 'Datos Incorrectos';
-    } 
-
-
-    
+    }     
 }
 
 $('form').change(function () {
@@ -82,16 +136,4 @@ $('form').change(function () {
     $('#DatosTablaSerializados').val(datosTablaJson);
 });
 
-function validarForm() {
-    const gastosAdm = document.getElementById('TotalGastosString');
-
-    console.log(gastosAdm);
-
-    if (gastosAdm.value == 'Datos Incorrectos') {
-        alert('Los valores ingresados no son correctos.');
-        return false;
-    }
-
-    return false;
-}
 

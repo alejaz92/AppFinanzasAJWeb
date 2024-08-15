@@ -5,7 +5,7 @@
 }
 <div class="container-fluid">
     <h1>Pago de Tarjeta</h1>
-    <form asp-action="PagoTarjeta" method="post" onsubmit="return ValidarForm()">
+    <form asp-action="PagoTarjeta" method="post" onsubmit="return algo()">
         <input type="hidden" value="@Model.Cotizacion.Valor" class="ids" id="Cotizacion" asp-for ="Cotizacion.Valor" />
         <input type="hidden" asp-for="MovsTarjetaSerializados" id="DatosTablaSerializados" />
         <div class="row">
@@ -123,9 +123,13 @@
 
 @section Scripts {
 
+
+
     <script src="~/js/pagoTarjeta.js" asp-append-version="true"></script>
 
     <script type="text/javascript">
+        
+
         function actualizarTablaGastos() {
 
 
