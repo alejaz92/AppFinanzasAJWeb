@@ -7,6 +7,7 @@ namespace AppFinanzasWeb.Servicios
     public interface IRepositorioCotizacionesActivos
     {
         Task<CotizacionActivo> GetCotizDolarTarjeta();
+        Task<CotizacionActivo> GetUltimaCotizPorMoneda(int idActivo);
     }
     public class RepositorioCotizacionActivo : IRepositorioCotizacionesActivos
     {
@@ -29,5 +30,17 @@ namespace AppFinanzasWeb.Servicios
                                                                                 WHERE A1.SIMBOLO = 'USD' AND A2.SIMBOLO = 'ARS' AND CA.TIPO = 'TARJETA' 
                                                                                 AND IDFECHA = (SELECT MAX(IDFECHA) FROM Cotizacion_Activo)");
         }
+
+        public async Task<CotizacionActivo> GetUltimaCotizPorMoneda(int idActivo)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            return await connection.QueryFirstOrDefaultAsync<CotizacionActivo>(@"SELECT 
+	                                                                                VALOR 
+                                                                                FROM Cotizacion_Activo 
+                                                                                WHERE IDACTIVOMP = @IdActivo 
+                                                                                AND IDFECHA = (SELECT MAX(IDFECHA) FROM Cotizacion_Activo)", 
+                                                                                new {idActivo});
+        } 
     }
 }

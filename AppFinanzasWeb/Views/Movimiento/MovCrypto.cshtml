@@ -1,0 +1,23 @@
+﻿@model AppFinanzasWeb.ViewModels.InvCryptoViewModel
+@{
+    ViewData["title"] = "Nuevo movimiento Crypto";
+}
+
+<h1>Nuevo movimiento Crypto</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<div class="container mt-4">
+    <form >
+
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"  />
+}

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using AppFinanzasWeb.ViewModels;
 using System.ClientModel.Primitives;
 using System.Globalization;
+using System.Reflection;
 
 
 namespace AppFinanzasWeb.Controllers
@@ -15,14 +16,17 @@ namespace AppFinanzasWeb.Controllers
         private readonly IRepositorioActivos repositorioActivos;
         private readonly IRepositorioCuentas repositorioCuentas;
         private readonly IRepositorioClaseMovimientos repositorioClaseMovimientos;
+        private readonly IRepositorioCotizacionesActivos repositorioCotizacionesActivos;
 
         public MovimientoController(IRepositorioMovimientos repositorioMovimientos, IRepositorioActivos repositorioActivos,
-            IRepositorioCuentas repositorioCuentas, IRepositorioClaseMovimientos repositorioClaseMovimientos)
+            IRepositorioCuentas repositorioCuentas, IRepositorioClaseMovimientos repositorioClaseMovimientos, 
+            IRepositorioCotizacionesActivos repositorioCotizacionesActivos)
         {
             this.repositorioMovimientos = repositorioMovimientos;
             this.repositorioActivos = repositorioActivos;
             this.repositorioCuentas = repositorioCuentas;
             this.repositorioClaseMovimientos = repositorioClaseMovimientos;
+            this.repositorioCotizacionesActivos = repositorioCotizacionesActivos;
         }
 
         public async Task<IActionResult> Index(int pagina = 1)
@@ -273,6 +277,83 @@ namespace AppFinanzasWeb.Controllers
             await repositorioMovimientos.Actualizar(movimiento.IdMovimiento, movimiento.Monto);
 
             return RedirectToAction("Index");
+
+        }
+
+        public async Task<IActionResult> MovCrypto()
+        {
+            ViewBag.ActivosCrypto = await repositorioActivos.ObtenerPorTipo("CriptoMoneda");
+            ViewBag.ActivosMoneda = await repositorioActivos.ObtenerPorTipo("Moneda");
+            ViewBag.CuentasCrypto = await repositorioCuentas.ObtenerPorTipo("Criptomoneda");
+            ViewBag.CuentasMoneda = await repositorioCuentas.ObtenerPorTipo("Moneda");
+
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MovCrypto(InvCryptoViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(viewModel);
+            }
+
+            var idMovimiento = await repositorioMovimientos.ObtenerIdMaximo() + 1;
+
+            if (viewModel.TipoMovimiento == "Ingreso")
+            {
+                decimal cotiz = 1 / Convert.ToDecimal(viewModel.CotizacionIng);
+
+                Movimiento movimientoIng = new Movimiento
+                {
+                    IdMovimiento = idMovimiento,
+                    IdCuenta = (int)viewModel.IdCuentaIng,
+                    IdActivo = (int)viewModel.IdActivoIng,
+                    TipoMovimiento = "Ingreso",
+                    IdClaseMovimiento = null,
+                    Comentario = null,
+                    Monto = viewModel.CantidadIng,
+                    Fecha = viewModel.Fecha,
+                    PrecioCotiz = cotiz
+                };
+
+                await repositorioMovimientos.InsertarMovimiento(movimientoIng);
+
+                if (viewModel.TipoComercio == "Comercio Fiat/Cripto")
+                {
+                    CotizacionActivo cotizacion = await repositorioCotizacionesActivos.GetUltimaCotizPorMoneda(viewModel.IdActivoEgr);
+
+                    ClaseMovimiento claseInversion = await repositorioClaseMovimientos.ObtenerPorDescripcion("Inversion");
+                    Movimiento movimientoEgr = new Movimiento
+                    {
+                        IdMovimiento = idMovimiento + 1,
+                        IdCuenta = (int)viewModel.IdCuentaEgr,
+                        IdActivo = (int)viewModel.IdActivoEgr,
+                        TipoMovimiento = "Egreso",
+                        IdClaseMovimiento = claseInversion.Id,
+                        Comentario = null,
+                        Monto = viewModel.CantidadEgr,
+                        Fecha = viewModel.Fecha,
+                        PrecioCotiz = cotizacion.Valor
+                    };
+
+                    await repositorioMovimientos.InsertarMovimiento(movimientoEgr);
+                }
+            }
+            else if (viewModel.TipoMovimiento == "Ingreso")
+            {
+                 
+            }
+            else if(viewModel.TipoMovimiento == "Intercambio")
+            {
+
+            }
+
+
+
+            TempData["SuccessMessage"] = "Movimiento registrado con éxito.";
+            return RedirectToAction(nameof(MovCrypto));
 
         }
     }
