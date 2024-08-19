@@ -1,5 +1,5 @@
 ﻿
-function algo() {
+function checkSubmit() {
     
     const tarjeta = document.getElementById('IdTarjeta'); 
     if (tarjeta.value == "") {

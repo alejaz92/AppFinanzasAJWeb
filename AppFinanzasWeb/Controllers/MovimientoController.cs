@@ -341,16 +341,83 @@ namespace AppFinanzasWeb.Controllers
                     await repositorioMovimientos.InsertarMovimiento(movimientoEgr);
                 }
             }
-            else if (viewModel.TipoMovimiento == "Ingreso")
+            else if (viewModel.TipoMovimiento == "Egreso")
             {
-                 
+                decimal cotiz = 1 / Convert.ToDecimal(viewModel.CotizacionEgr);
+
+                Movimiento movimientoEgr = new Movimiento
+                {
+                    IdMovimiento = idMovimiento,
+                    IdCuenta = (int)viewModel.IdCuentaEgr,
+                    IdActivo = (int)viewModel.IdActivoEgr,
+                    TipoMovimiento = "Egreso",
+                    IdClaseMovimiento = null,
+                    Comentario = null,
+                    Monto = viewModel.CantidadEgr,
+                    Fecha = viewModel.Fecha,
+                    PrecioCotiz = cotiz
+                };
+
+                await repositorioMovimientos.InsertarMovimiento(movimientoEgr);
+
+                if(viewModel.TipoComercio == "Comercio Fiat/Cripto")
+                {
+                    CotizacionActivo cotizacion = await repositorioCotizacionesActivos.GetUltimaCotizPorMoneda(viewModel.IdActivoIng);
+
+                    ClaseMovimiento claseInversion = await repositorioClaseMovimientos.ObtenerPorDescripcion("Ingreso Inversion");
+                    Movimiento movimientoIng = new Movimiento
+                    {
+                        IdMovimiento = idMovimiento + 1,
+                        IdCuenta = (int)viewModel.IdCuentaIng,
+                        IdActivo = (int)viewModel.IdActivoIng,
+                        TipoMovimiento = "Ingreso",
+                        IdClaseMovimiento = claseInversion.Id,
+                        Comentario = null,
+                        Monto = viewModel.CantidadIng,
+                        Fecha = viewModel.Fecha,
+                        PrecioCotiz = cotizacion.Valor
+                    };
+
+                    await repositorioMovimientos.InsertarMovimiento(movimientoIng);
+                }
+
             }
-            else if(viewModel.TipoMovimiento == "Intercambio")
+            else if (viewModel.TipoMovimiento == "Intercambio" && viewModel.TipoComercio == "Trading")
             {
+                decimal cotizIng = 1 / Convert.ToDecimal(viewModel.CotizacionIng);
 
+                Movimiento movimientoIng = new Movimiento
+                {
+                    IdMovimiento = idMovimiento,
+                    IdCuenta = (int)viewModel.IdCuentaIng,
+                    IdActivo = (int)viewModel.IdActivoIng,
+                    TipoMovimiento = "Ingreso",
+                    IdClaseMovimiento = null,
+                    Comentario = null,
+                    Monto = viewModel.CantidadIng,
+                    Fecha = viewModel.Fecha,
+                    PrecioCotiz = cotizIng
+                };
+
+                await repositorioMovimientos.InsertarMovimiento(movimientoIng);
+
+                decimal cotizEgr = 1 / Convert.ToDecimal(viewModel.CotizacionEgr);
+
+                Movimiento movimientoEgr = new Movimiento
+                {
+                    IdMovimiento = idMovimiento,
+                    IdCuenta = (int)viewModel.IdCuentaEgr,
+                    IdActivo = (int)viewModel.IdActivoEgr,
+                    TipoMovimiento = "Egreso",
+                    IdClaseMovimiento = null,
+                    Comentario = null,
+                    Monto = viewModel.CantidadEgr,
+                    Fecha = viewModel.Fecha,
+                    PrecioCotiz = cotizEgr
+                };
+
+                await repositorioMovimientos.InsertarMovimiento(movimientoEgr);
             }
-
-
 
             TempData["SuccessMessage"] = "Movimiento registrado con éxito.";
             return RedirectToAction(nameof(MovCrypto));

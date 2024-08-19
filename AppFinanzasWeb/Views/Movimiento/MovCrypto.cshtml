@@ -13,11 +13,90 @@
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
 <div class="container mt-4">
-    <form >
+    <form asp-action="MovCrypto" method="post">
+        <div class="container">
 
+            <div class="row mb-3">
+
+                <div class="col-md-6">
+                    <label for="TipoMovimiento" class="form-label">Tipo de Movimiento</label>
+                    <select class="form-control" asp-for="TipoMovimiento" id="TipoMovimiento" onchange="updateListaTiposComercio()">
+                        <option value="">Seleccione</option>
+                        <option value="Ingreso">Ingreso</option>
+                        <option value="Egreso">Egreso</option>
+                        <option value="Intercambio">Intercambio</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="TipoComercio" class="form-label">Tipo de Comercio</label>
+                    <select asp-for="TipoComercio" class="form-control" id="TipoComercio" onchange="updateGruposForm()">
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label  for="Fecha" class="form-label">Fecha</label>
+                    <input class="form-control" asp-for="Fecha" type="date" id="Fecha" />
+                </div>
+   
+            </div>  
+            <div class="row mb-3" id="EgresoGroup" style="display: none">
+                <div class="col-12">
+                    <h4>Egreso</h4>
+                </div>
+                <div class="col-md-6">
+                    <label for="IdActivoEgr" class="form-label">Activo</label>
+                    <select asp-for="IdActivoEgr" class="form-control" id="IdActivoEgr">
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="IdCuentaEgr" class="form-label">Cuenta</label>
+                    <select asp-for="IdCuentaEgr" class="form-control" id="IdCuentaEgr">
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="CantidadEgr" class="form-label">Cantidad</label>
+                    <input class="form-control" asp-for="CantidadEgr" type="text" id="CantidadEgr" />
+                </div>
+                <div class="col-md-6">
+                    <label for="CotizacionEgr" class="form-label">Cotización en USD</label>
+                    <input class="form-control" asp-for="CotizacionEgr" type="text" id="CotizacionEgr" />
+                </div>
+            </div>
+
+            <div class="row mb-3" id="IngresoGroup" style="display: none">
+                <div class="col-12">
+                    <h4>Ingreso</h4>
+                </div>
+                <div class="col-md-6">
+                    <label for="IdActivoIng" class="form-label">Activo</label>
+                    <select asp-for="IdActivoIng" class="form-control" id="IdActivoIng">
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="IdCuentaIng" class="form-label">Cuenta</label>
+                    <select asp-for="IdCuentaIng" class="form-control" id="IdCuentaIng">
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="CantidadIng" class="form-label">Cantidad</label>
+                    <input class="form-control" asp-for="CantidadIng" type="text" id="CantidadIng" />
+                </div>
+                <div class="col-md-6">
+                    <label for="CotizacionIng" class="form-label">Cotización en USD</label>
+                    <input class="form-control" asp-for="CotizacionIng" type="text" id="CotizacionIng" />
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary">Insertar</button>
+            </div>
+        </div>        
     </form>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial"  />
+
+    <script src="~/js/MovCrypto.js" asp-append-version="true"></script>
 }

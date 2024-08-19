@@ -7,10 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\MovCrypto.js" />
     <Content Remove="wwwroot\js\pagoTarjeta.js" />
   </ItemGroup>
 
   <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\js\MovCrypto.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\MovCrypto.js" />
     <None Include="wwwroot\js\pagoTarjeta.js" />
   </ItemGroup>
 
