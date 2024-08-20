@@ -294,6 +294,7 @@ namespace AppFinanzasWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> MovCrypto(InvCryptoViewModel viewModel)
         {
+            
             if (!ModelState.IsValid)
             {
                 return View(viewModel);
@@ -313,8 +314,8 @@ namespace AppFinanzasWeb.Controllers
                     TipoMovimiento = "Ingreso",
                     IdClaseMovimiento = null,
                     Comentario = null,
-                    Monto = viewModel.CantidadIng,
-                    Fecha = viewModel.Fecha,
+                    Monto = (decimal)viewModel.CantidadIng,
+                    Fecha = (DateTime)viewModel.Fecha,
                     PrecioCotiz = cotiz
                 };
 
@@ -322,7 +323,7 @@ namespace AppFinanzasWeb.Controllers
 
                 if (viewModel.TipoComercio == "Comercio Fiat/Cripto")
                 {
-                    CotizacionActivo cotizacion = await repositorioCotizacionesActivos.GetUltimaCotizPorMoneda(viewModel.IdActivoEgr);
+                    CotizacionActivo cotizacion = await repositorioCotizacionesActivos.GetUltimaCotizPorMoneda((int)viewModel.IdActivoEgr);
 
                     ClaseMovimiento claseInversion = await repositorioClaseMovimientos.ObtenerPorDescripcion("Inversion");
                     Movimiento movimientoEgr = new Movimiento
@@ -333,7 +334,7 @@ namespace AppFinanzasWeb.Controllers
                         TipoMovimiento = "Egreso",
                         IdClaseMovimiento = claseInversion.Id,
                         Comentario = null,
-                        Monto = viewModel.CantidadEgr,
+                        Monto = (decimal)viewModel.CantidadEgr,
                         Fecha = viewModel.Fecha,
                         PrecioCotiz = cotizacion.Valor
                     };
@@ -353,7 +354,7 @@ namespace AppFinanzasWeb.Controllers
                     TipoMovimiento = "Egreso",
                     IdClaseMovimiento = null,
                     Comentario = null,
-                    Monto = viewModel.CantidadEgr,
+                    Monto = (decimal)viewModel.CantidadEgr,
                     Fecha = viewModel.Fecha,
                     PrecioCotiz = cotiz
                 };
@@ -362,7 +363,7 @@ namespace AppFinanzasWeb.Controllers
 
                 if(viewModel.TipoComercio == "Comercio Fiat/Cripto")
                 {
-                    CotizacionActivo cotizacion = await repositorioCotizacionesActivos.GetUltimaCotizPorMoneda(viewModel.IdActivoIng);
+                    CotizacionActivo cotizacion = await repositorioCotizacionesActivos.GetUltimaCotizPorMoneda((int)viewModel.IdActivoIng);
 
                     ClaseMovimiento claseInversion = await repositorioClaseMovimientos.ObtenerPorDescripcion("Ingreso Inversion");
                     Movimiento movimientoIng = new Movimiento
@@ -373,7 +374,7 @@ namespace AppFinanzasWeb.Controllers
                         TipoMovimiento = "Ingreso",
                         IdClaseMovimiento = claseInversion.Id,
                         Comentario = null,
-                        Monto = viewModel.CantidadIng,
+                        Monto = (decimal)viewModel.CantidadIng,
                         Fecha = viewModel.Fecha,
                         PrecioCotiz = cotizacion.Valor
                     };
@@ -394,7 +395,7 @@ namespace AppFinanzasWeb.Controllers
                     TipoMovimiento = "Ingreso",
                     IdClaseMovimiento = null,
                     Comentario = null,
-                    Monto = viewModel.CantidadIng,
+                    Monto = (decimal)viewModel.CantidadIng,
                     Fecha = viewModel.Fecha,
                     PrecioCotiz = cotizIng
                 };
@@ -411,7 +412,7 @@ namespace AppFinanzasWeb.Controllers
                     TipoMovimiento = "Egreso",
                     IdClaseMovimiento = null,
                     Comentario = null,
-                    Monto = viewModel.CantidadEgr,
+                    Monto = (decimal)viewModel.CantidadEgr,
                     Fecha = viewModel.Fecha,
                     PrecioCotiz = cotizEgr
                 };

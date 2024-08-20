@@ -13,7 +13,7 @@
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
 <div class="container mt-4">
-    <form asp-action="MovCrypto" method="post">
+    <form asp-action="MovCrypto" method="post" onsubmit="return checkSubmit()">
         <div class="container">
 
             <div class="row mb-3">
@@ -46,12 +46,18 @@
                 </div>
                 <div class="col-md-6">
                     <label for="IdActivoEgr" class="form-label">Activo</label>
-                    <select asp-for="IdActivoEgr" class="form-control" id="IdActivoEgr">
+                    <select asp-for="IdActivoEgr" class="form-control" id="IdActivoEgr"
+                            data-crypto='@Html.Raw(Json.Serialize(ViewBag.ActivosCrypto))'
+                            data-moneda='@Html.Raw(Json.Serialize(ViewBag.ActivosMoneda))'>
+                        <option>Seleccione</option>
                     </select>
                 </div>
                 <div class="col-md-6">
                     <label for="IdCuentaEgr" class="form-label">Cuenta</label>
-                    <select asp-for="IdCuentaEgr" class="form-control" id="IdCuentaEgr">
+                    <select asp-for="IdCuentaEgr" class="form-control" id="IdCuentaEgr"
+                            data-crypto='@Html.Raw(Json.Serialize(ViewBag.CuentasCrypto))'
+                            data-moneda='@Html.Raw(Json.Serialize(ViewBag.CuentasMoneda))'>
+                        <option>Seleccione</option>
                     </select>
                 </div>
                 <div class="col-md-6">
@@ -70,12 +76,18 @@
                 </div>
                 <div class="col-md-6">
                     <label for="IdActivoIng" class="form-label">Activo</label>
-                    <select asp-for="IdActivoIng" class="form-control" id="IdActivoIng">
+                    <select asp-for="IdActivoIng" class="form-control" id="IdActivoIng"
+                            data-crypto='@Html.Raw(Json.Serialize(ViewBag.ActivosCrypto))' 
+                            data-moneda='@Html.Raw(Json.Serialize(ViewBag.ActivosMoneda))'>
+                        <option>Seleccione</option>
                     </select>
                 </div>
                 <div class="col-md-6">
                     <label for="IdCuentaIng" class="form-label">Cuenta</label>
-                    <select asp-for="IdCuentaIng" class="form-control" id="IdCuentaIng">
+                    <select asp-for="IdCuentaIng" class="form-control" id="IdCuentaIng"
+                            data-crypto='@Html.Raw(Json.Serialize(ViewBag.CuentasCrypto))'
+                            data-moneda='@Html.Raw(Json.Serialize(ViewBag.CuentasMoneda))'>
+                        <option>Seleccione</option>
                     </select>
                 </div>
                 <div class="col-md-6">
@@ -99,4 +111,5 @@
     <partial name="_ValidationScriptsPartial"  />
 
     <script src="~/js/MovCrypto.js" asp-append-version="true"></script>
+
 }
