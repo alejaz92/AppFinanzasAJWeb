@@ -44,6 +44,8 @@ function updateGruposForm() {
 
     const grupoIngresos = document.getElementById('IngresoGroup');
     const grupoEgresos = document.getElementById('EgresoGroup');
+    const grupoCotizacionIng = document.getElementById('CotizacionIngGroup');
+    const grupoCotizacionEgr = document.getElementById('CotizacionEgrGroup');
 
     const IdActivoEgr = document.getElementById('IdActivoEgr');
     const IdCuentaEgr = document.getElementById('IdCuentaEgr');
@@ -69,6 +71,7 @@ function updateGruposForm() {
     if (tipoMovimiento === 'Ingreso' && tipoComercio === 'Ajuste de Saldos') {
         grupoEgresos.style.display = 'none';
         grupoIngresos.style.display = 'flex';
+        grupoCotizacionIng.style.display = 'block';
 
         opcionesActivoIng = JSON.parse(IdActivoIng.getAttribute('data-crypto'));
         opcionesCuentaIng = JSON.parse(IdCuentaIng.getAttribute('data-crypto'));
@@ -89,6 +92,9 @@ function updateGruposForm() {
     } else if (tipoMovimiento === 'Ingreso' && tipoComercio === 'Comercio Fiat/Cripto') {
         grupoEgresos.style.display = 'flex';
         grupoIngresos.style.display = 'flex';
+        grupoCotizacionIng.style.display = 'block';
+        grupoCotizacionEgr.style.display = 'none';
+
 
         opcionesActivoIng = JSON.parse(IdActivoIng.getAttribute('data-crypto'));
         opcionesCuentaIng = JSON.parse(IdCuentaIng.getAttribute('data-crypto'));
@@ -124,6 +130,7 @@ function updateGruposForm() {
     } else if (tipoMovimiento === 'Egreso' && tipoComercio === 'Ajuste de Saldos') {
         grupoEgresos.style.display = 'flex';
         grupoIngresos.style.display = 'none';
+        grupoCotizacionEgr.style.display = 'block';
 
         opcionesActivoEgr = JSON.parse(IdActivoEgr.getAttribute('data-crypto'));
         opcionesCuentaEgr = JSON.parse(IdCuentaEgr.getAttribute('data-crypto'));
@@ -143,6 +150,8 @@ function updateGruposForm() {
     } else if (tipoMovimiento === 'Egreso' && tipoComercio === 'Comercio Fiat/Cripto') {
         grupoEgresos.style.display = 'flex';
         grupoIngresos.style.display = 'flex';
+        grupoCotizacionIng.style.display = 'none';
+        grupoCotizacionEgr.style.display = 'block';
 
         opcionesActivoEgr = JSON.parse(IdActivoEgr.getAttribute('data-crypto'));
         opcionesCuentaEgr = JSON.parse(IdCuentaEgr.getAttribute('data-crypto'));
@@ -177,6 +186,8 @@ function updateGruposForm() {
     } else if (tipoMovimiento === 'Intercambio') {
         grupoEgresos.style.display = 'flex';
         grupoIngresos.style.display = 'flex';
+        grupoCotizacionIng.style.display = 'block';
+        grupoCotizacionEgr.style.display = 'block';
 
         opcionesActivoEgr = JSON.parse(IdActivoEgr.getAttribute('data-crypto'));
         opcionesCuentaEgr = JSON.parse(IdCuentaEgr.getAttribute('data-crypto'));
@@ -271,8 +282,8 @@ function checkSubmit() {
             alert('Debe seleccionar una cuenta correcta');
             return false;
         }
-        if (!isNaN(CantidadIng) || !isNaN(CotizacionIng) || !isNaN(CantidadEgr) || !isNaN(CotizacionEgr) ||
-            CantidadIng.value === '' || CotizacionIng.value === '' || CantidadEgr.value === '' || CotizacionEgr.value === '') {
+        if (!isNaN(CantidadIng) || !isNaN(CotizacionIng) || !isNaN(CantidadEgr) ||
+            CantidadIng.value === '' || CotizacionIng.value === '' || CantidadEgr.value === '' ) {
             alert('Debe insertar valores numericos correctos');
             return false;
         }
@@ -311,8 +322,8 @@ function checkSubmit() {
             return false;
         }
 
-        if (!isNaN(CantidadIng) || !isNaN(CotizacionIng) || !isNaN(CantidadEgr) || !isNaN(CotizacionEgr) ||
-            CantidadIng.value === '' || CotizacionIng.value === '' || CantidadEgr.value === '' || CotizacionEgr.value === '') {
+        if (!isNaN(CantidadIng) || !isNaN(CantidadEgr) || !isNaN(CotizacionEgr) ||
+            CantidadIng.value === '' || CantidadEgr.value === '' || CotizacionEgr.value === '') {
             alert('Debe insertar valores numericos correctos');
             return false;
         }

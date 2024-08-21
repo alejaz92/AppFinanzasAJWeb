@@ -7,7 +7,7 @@ namespace AppFinanzasWeb.Servicios
     public interface IRepositorioCotizacionesActivos
     {
         Task<CotizacionActivo> GetCotizDolarTarjeta();
-        Task<CotizacionActivo> GetUltimaCotizPorMoneda(int idActivo);
+        Task<CotizacionActivo> GetUltimaCotizPorMoneda(int idActivo, string? tipo);
     }
     public class RepositorioCotizacionActivo : IRepositorioCotizacionesActivos
     {
@@ -31,16 +31,22 @@ namespace AppFinanzasWeb.Servicios
                                                                                 AND IDFECHA = (SELECT MAX(IDFECHA) FROM Cotizacion_Activo)");
         }
 
-        public async Task<CotizacionActivo> GetUltimaCotizPorMoneda(int idActivo)
+        public async Task<CotizacionActivo> GetUltimaCotizPorMoneda(int idActivo, string? tipo)
         {
             using var connection = new SqlConnection(connectionString);
 
-            return await connection.QueryFirstOrDefaultAsync<CotizacionActivo>(@"SELECT 
-	                                                                                VALOR 
-                                                                                FROM Cotizacion_Activo 
-                                                                                WHERE IDACTIVOMP = @IdActivo 
-                                                                                AND IDFECHA = (SELECT MAX(IDFECHA) FROM Cotizacion_Activo)", 
-                                                                                new {idActivo});
+            var sql = @"SELECT 
+	                        VALOR 
+                        FROM Cotizacion_Activo 
+                        WHERE IDACTIVOCOMP = @IdActivo 
+                        AND IDFECHA = (SELECT MAX(IDFECHA) FROM Cotizacion_Activo)";
+
+            if (tipo != null) {
+                sql = sql + " AND TIPO = @Tipo";
+                return await connection.QueryFirstOrDefaultAsync<CotizacionActivo>(sql, new { idActivo, tipo });
+            }
+
+            return await connection.QueryFirstOrDefaultAsync<CotizacionActivo>(sql,new {idActivo});
         } 
     }
 }
