@@ -1,0 +1,133 @@
+﻿@model AppFinanzasWeb.ViewModels.InvBolsaViewModel
+@{
+    ViewData["title"] = "Nueva Inversion en Bolsa";
+}
+<h1>Nuevo movimiento de Bolsa</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<div class="container mt-4">
+    <form asp-action="MovBolsa" method="post">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="TipoMovimiento" class="form-label">Tipo de Movimiento</label>
+                <select class="form-control" asp-for="TipoMovimiento" id="TipoMovimiento" onchange="updateGruposForm()">
+                    <option value="">Seleccione</option>
+                    <option value="Ingreso">Ingreso</option>
+                    <option value="Egreso">Egreso</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label for="Fecha" class="form-label">Fecha</label>
+                <input class="form-control" asp-for="Fecha" type="date" id="Fecha" />
+            </div>
+
+            <div class="col-md-6">
+                <label for="TipoComercio" class="form-label">Tipo de Comercio</label>
+                <select asp-for="TipoComercio" class="form-control" id="TipoComercio" onchange="updateGruposForm()">
+                    <option>Seleccione</option>
+                    <option value="AjusteSaldos">Ajuste de Saldos</option>
+                    <option value="General">General</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label for="TipoActivo" class="form-label">Tipo de Activo</label>
+                <select asp-for="TipoActivo" class="form-control" id="TipoActivo" onchange="updateTipoActivo()">
+                    <option>Seleccione</option>
+                    @foreach (var tipoActivo in ViewBag.TiposActivo)
+                    {
+                        <option value="@tipoActivo.Id">@tipoActivo.Nombre</option>
+                    }
+                </select>
+            </div>
+        </div>
+        
+        <div class="row mb-3" id="EgresoGroup" style="display: none">
+            <div class="col-12">
+                <h4>Egreso</h4>
+            </div>
+            <div class="col-md-6">
+                <label for="IdActivoEgr" class="form-label">Activo</label>
+                <select asp-for="IdActivoEgr" class="form-control" id="IdActivoEgr"
+                        data-accion='@Html.Raw(Json.Serialize(ViewBag.ActivosAccion))'
+                        data-bonos='@Html.Raw(Json.Serialize(ViewBag.ActivosBonos))'
+                        data-cedear='@Html.Raw(Json.Serialize(ViewBag.ActivosCEDEAR))'
+                        data-fci='@Html.Raw(Json.Serialize(ViewBag.ActivosFCI))'
+                        data-moneda='@Html.Raw(Json.Serialize(ViewBag.ActivosMoneda))'>
+                    <option>Seleccione</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="IdCuentaEgr" class="form-label">Cuenta</label>
+                <select asp-for="IdCuentaEgr" class="form-control" id="IdCuentaEgr">
+                    <option>Seleccione</option>
+                    @foreach (var cuenta in ViewBag.CuentasBolsa)
+                    {
+                        <option value="@cuenta.Id">@cuenta.CuentaNombre</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="CantidadEgr" class="form-label">Cantidad</label>
+                <input class="form-control" asp-for="CantidadEgr" type="text" id="CantidadEgr" />
+            </div>
+            <div class="col-md-6" id="CotizacionEgrGroup">
+                <label for="CotizacionEgr" class="form-label">Cotización en USD</label>
+                <input class="form-control" asp-for="CotizacionEgr" type="text" id="CotizacionEgr" />
+            </div>
+        </div>
+
+        <div class="row mb-3" id="IngresoGroup" style="display: none">
+            <div class="col-12">
+                <h4>Ingreso</h4>
+            </div>
+            <div class="col-md-6">
+                <label for="IdActivoIng" class="form-label">Activo</label>
+                <select asp-for="IdActivoIng" class="form-control" id="IdActivoIng"
+                        data-accion='@Html.Raw(Json.Serialize(ViewBag.ActivosAccion))'
+                        data-bonos='@Html.Raw(Json.Serialize(ViewBag.ActivosBonos))'
+                        data-cedear='@Html.Raw(Json.Serialize(ViewBag.ActivosCEDEAR))'
+                        data-fci='@Html.Raw(Json.Serialize(ViewBag.ActivosFCI))'
+                        data-moneda='@Html.Raw(Json.Serialize(ViewBag.ActivosMoneda))'>
+                    <option>Seleccione</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="IdCuentaIng" class="form-label">Cuenta</label>
+                <select asp-for="IdCuentaIng" class="form-control" id="IdCuentaIng">
+                    <option>Seleccione</option>
+                    @foreach (var cuenta in ViewBag.CuentasBolsa)
+                    {
+                        <option value="@cuenta.Id">@cuenta.CuentaNombre</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="CantidadIng" class="form-label">Cantidad</label>
+                <input class="form-control" asp-for="CantidadIng" type="text" id="CantidadIng" />
+            </div>
+            <div class="col-md-6" id="CotizacionIngGroup">
+                <label for="CotizacionIng" class="form-label">Cotización en USD</label>
+                <input class="form-control" asp-for="CotizacionIng" type="text" id="CotizacionIng" />
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Insertar</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="~/js/MovBolsa.js" asp-append-version="true"></script>
+
+}

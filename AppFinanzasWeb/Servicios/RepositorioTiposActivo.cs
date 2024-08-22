@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using AppFinanzasWeb.Models;
 using Microsoft.Data.SqlClient;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AppFinanzasWeb.Servicios
 {
@@ -9,6 +10,7 @@ namespace AppFinanzasWeb.Servicios
     {
         Task<bool> ActualizarCuentaTiposActivos(int IdCuenta, List<int> IdTipoActivos);
         Task<IEnumerable<TipoActivo>> Obtener();
+        Task<IEnumerable<TipoActivo>> ObtenerBolsa();
         Task<IEnumerable<CuentaTipoActivo>> ObtenerPorCuenta(int IdCuenta);
         Task<TipoActivo> ObtenerPorId(int id);
     }
@@ -37,6 +39,16 @@ namespace AppFinanzasWeb.Servicios
                                                                      WHERE idTipoActivo = @Id",
                                                                      new { Id });
         }
+
+        public async Task<IEnumerable<TipoActivo>> ObtenerBolsa()
+        {
+            using var connection = new SqlConnection(connectionString);
+            return await connection.QueryAsync<TipoActivo>(@"SELECT idTipoActivo Id, Nombre
+                                                            FROM Dim_Tipo_Activo
+                                                            WHERE Nombre NOT IN('Moneda', 'Criptomoneda')");
+        }
+
+        
 
         public async Task<IEnumerable<CuentaTipoActivo>> ObtenerPorCuenta(int IdCuenta)
         {

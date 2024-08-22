@@ -66,7 +66,6 @@ function updateGruposForm() {
     CotizacionIng.value = '';
 
 
-    var opcionesActivoIng;
 
     if (tipoMovimiento === 'Ingreso' && tipoComercio === 'Ajuste de Saldos') {
         grupoEgresos.style.display = 'none';

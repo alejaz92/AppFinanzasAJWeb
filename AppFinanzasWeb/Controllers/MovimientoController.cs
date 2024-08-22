@@ -17,16 +17,18 @@ namespace AppFinanzasWeb.Controllers
         private readonly IRepositorioCuentas repositorioCuentas;
         private readonly IRepositorioClaseMovimientos repositorioClaseMovimientos;
         private readonly IRepositorioCotizacionesActivos repositorioCotizacionesActivos;
+        private readonly IRepositorioTiposActivo repositorioTiposActivo;
 
         public MovimientoController(IRepositorioMovimientos repositorioMovimientos, IRepositorioActivos repositorioActivos,
             IRepositorioCuentas repositorioCuentas, IRepositorioClaseMovimientos repositorioClaseMovimientos, 
-            IRepositorioCotizacionesActivos repositorioCotizacionesActivos)
+            IRepositorioCotizacionesActivos repositorioCotizacionesActivos, IRepositorioTiposActivo repositorioTiposActivo)
         {
             this.repositorioMovimientos = repositorioMovimientos;
             this.repositorioActivos = repositorioActivos;
             this.repositorioCuentas = repositorioCuentas;
             this.repositorioClaseMovimientos = repositorioClaseMovimientos;
             this.repositorioCotizacionesActivos = repositorioCotizacionesActivos;
+            this.repositorioTiposActivo = repositorioTiposActivo;
         }
 
         public async Task<IActionResult> Index(int pagina = 1)
@@ -287,7 +289,6 @@ namespace AppFinanzasWeb.Controllers
             ViewBag.CuentasCrypto = await repositorioCuentas.ObtenerPorTipo("Criptomoneda");
             ViewBag.CuentasMoneda = await repositorioCuentas.ObtenerPorTipo("Moneda");
 
-
             return View();
         }
 
@@ -494,6 +495,19 @@ namespace AppFinanzasWeb.Controllers
             TempData["SuccessMessage"] = "Movimiento registrado con éxito.";
             return RedirectToAction(nameof(MovCrypto));
 
+        }
+
+        public async Task<IActionResult> MovBolsa()
+        {
+            ViewBag.TiposActivo = await repositorioTiposActivo.ObtenerBolsa();
+            ViewBag.ActivosAccion = await repositorioActivos.ObtenerPorTipo("Accion Argentina");
+            ViewBag.ActivosBonos = await repositorioActivos.ObtenerPorTipo("Bonos");
+            ViewBag.ActivosCEDEAR = await repositorioActivos.ObtenerPorTipo("CEDEAR");
+            ViewBag.ActivosMoneda = await repositorioActivos.ObtenerPorTipo("Moneda");
+            ViewBag.ActivosFCI = await repositorioActivos.ObtenerPorTipo("FCI");
+            ViewBag.CuentasBolsa = await repositorioCuentas.ObtenerPorTipo("FCI");
+
+            return View();
         }
     }
 }
