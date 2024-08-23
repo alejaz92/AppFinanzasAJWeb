@@ -500,14 +500,32 @@ namespace AppFinanzasWeb.Controllers
         public async Task<IActionResult> MovBolsa()
         {
             ViewBag.TiposActivo = await repositorioTiposActivo.ObtenerBolsa();
+
+
+
+
             ViewBag.ActivosAccion = await repositorioActivos.ObtenerPorTipo("Accion Argentina");
             ViewBag.ActivosBonos = await repositorioActivos.ObtenerPorTipo("Bonos");
             ViewBag.ActivosCEDEAR = await repositorioActivos.ObtenerPorTipo("CEDEAR");
-            ViewBag.ActivosMoneda = await repositorioActivos.ObtenerPorTipo("Moneda");
             ViewBag.ActivosFCI = await repositorioActivos.ObtenerPorTipo("FCI");
+
+            ViewBag.ActivosMoneda = await repositorioActivos.ObtenerPorTipo("Moneda");
             ViewBag.CuentasBolsa = await repositorioCuentas.ObtenerPorTipo("FCI");
 
             return View();
+        }
+
+        [HttpPost]
+
+        public async Task<IActionResult> MovBolsa(InvBolsaViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            TempData["SuccessMessage"] = "Movimiento registrado con éxito.";
+            return RedirectToAction(nameof(MovBolsa));
         }
     }
 }

@@ -5,7 +5,7 @@
         public string TipoMovimiento { get; set; }
         public DateTime Fecha { get; set; }
         public string TipoComercio { get; set; }
-        public string TipoActivo { get; set; } 
+        public int TipoActivo { get; set; } 
         public int? IdActivoEgr { get; set; }
         public int? IdCuentaEgr { get; set; }  
         public decimal? CantidadEgr { get; set; }

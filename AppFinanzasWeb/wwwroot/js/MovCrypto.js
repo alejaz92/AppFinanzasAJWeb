@@ -229,8 +229,7 @@ function checkSubmit() {
     const tipoMovimiento = document.getElementById('TipoMovimiento').value;
     const tipoComercio = document.getElementById('TipoComercio').value;
     const fecha = document.getElementById('Fecha').value;
-    const grupoIngresos = document.getElementById('IngresoGroup');
-    const grupoEgresos = document.getElementById('EgresoGroup');
+
 
     const IdActivoEgr = document.getElementById('IdActivoEgr');
     const IdCuentaEgr = document.getElementById('IdCuentaEgr');
@@ -345,7 +344,6 @@ function checkSubmit() {
             alert('Debe seleccionar una cuenta correcta');
             return false;
         }
-        // 
 
         if (!isNaN(CantidadIng) || !isNaN(CotizacionIng) || !isNaN(CantidadEgr) || !isNaN(CotizacionEgr) ||
             CantidadIng.value === '' || CotizacionIng.value === '' || CantidadEgr.value === '' || CotizacionEgr.value === '') {

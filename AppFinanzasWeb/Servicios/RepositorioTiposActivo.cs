@@ -45,7 +45,7 @@ namespace AppFinanzasWeb.Servicios
             using var connection = new SqlConnection(connectionString);
             return await connection.QueryAsync<TipoActivo>(@"SELECT idTipoActivo Id, Nombre
                                                             FROM Dim_Tipo_Activo
-                                                            WHERE Nombre NOT IN('Moneda', 'Criptomoneda')");
+                                                            WHERE entorno = 'Bolsa'");
         }
 
         

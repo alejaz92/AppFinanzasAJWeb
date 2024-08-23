@@ -1,6 +1,6 @@
 ﻿@model AppFinanzasWeb.ViewModels.InvBolsaViewModel
 @{
-    ViewData["title"] = "Nueva Inversion en Bolsa";
+    ViewData["Title"] = "Nueva Inversion en Bolsa";
 }
 <h1>Nuevo movimiento de Bolsa</h1>
 
@@ -12,7 +12,7 @@
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
 <div class="container mt-4">
-    <form asp-action="MovBolsa" method="post">
+    <form asp-action="MovBolsa" method="post" onsubmit="return checkSubmit()">
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="TipoMovimiento" class="form-label">Tipo de Movimiento</label>
@@ -61,13 +61,13 @@
                         data-cedear='@Html.Raw(Json.Serialize(ViewBag.ActivosCEDEAR))'
                         data-fci='@Html.Raw(Json.Serialize(ViewBag.ActivosFCI))'
                         data-moneda='@Html.Raw(Json.Serialize(ViewBag.ActivosMoneda))'>
-                    <option>Seleccione</option>
+                    <option value="">Seleccione</option>
                 </select>
             </div>
             <div class="col-md-6">
                 <label for="IdCuentaEgr" class="form-label">Cuenta</label>
                 <select asp-for="IdCuentaEgr" class="form-control" id="IdCuentaEgr">
-                    <option>Seleccione</option>
+                    <option value="">Seleccione</option>
                     @foreach (var cuenta in ViewBag.CuentasBolsa)
                     {
                         <option value="@cuenta.Id">@cuenta.CuentaNombre</option>
@@ -96,13 +96,13 @@
                         data-cedear='@Html.Raw(Json.Serialize(ViewBag.ActivosCEDEAR))'
                         data-fci='@Html.Raw(Json.Serialize(ViewBag.ActivosFCI))'
                         data-moneda='@Html.Raw(Json.Serialize(ViewBag.ActivosMoneda))'>
-                    <option>Seleccione</option>
+                    <option value="">Seleccione</option>
                 </select>
             </div>
             <div class="col-md-6">
                 <label for="IdCuentaIng" class="form-label">Cuenta</label>
                 <select asp-for="IdCuentaIng" class="form-control" id="IdCuentaIng">
-                    <option>Seleccione</option>
+                    <option value="">Seleccione</option>
                     @foreach (var cuenta in ViewBag.CuentasBolsa)
                     {
                         <option value="@cuenta.Id">@cuenta.CuentaNombre</option>
