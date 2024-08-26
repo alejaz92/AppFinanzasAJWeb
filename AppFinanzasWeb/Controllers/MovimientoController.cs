@@ -315,34 +315,20 @@ namespace AppFinanzasWeb.Controllers
                     return RedirectToAction("NoEncontrado", "Home");
                 }
 
-                Movimiento movimientoIng = new Movimiento
-                {
-                    IdMovimiento = idMovimiento,
-                    IdCuenta = (int)viewModel.IdCuentaIng,
-                    IdActivo = (int)viewModel.IdActivoIng,
-                    TipoMovimiento = "Ingreso",
-                    IdClaseMovimiento = null,
-                    Comentario = viewModel.TipoComercio,
-                    Monto = (decimal)viewModel.CantidadIng,
-                    Fecha = (DateTime)viewModel.Fecha,
-                    PrecioCotiz = cotiz,
-                    ActivoNombre = activoIng.ActivoNombre
-                };
-
-                await repositorioMovimientos.InsertarMovimiento(movimientoIng);
-
                 if (viewModel.TipoComercio == "Comercio Fiat/Cripto")
                 {
                     Activo activoEgr = await repositorioActivos.ObtenerPorId((int)viewModel.IdActivoEgr);
                     Cuenta cuentaEgr = await repositorioCuentas.ObtenerPorId((int)viewModel.IdCuentaEgr);
                     ClaseMovimiento claseInversion = await repositorioClaseMovimientos.ObtenerPorDescripcion("Inversiones");
 
-                    if (activoIng is null || cuentaIng is null || claseInversion is null) 
+                    if (activoEgr is null || cuentaEgr is null || claseInversion is null)
                     {
                         return RedirectToAction("NoEncontrado", "Home");
                     }
+
+
                     string tipoActivo;
-                    if(activoEgr.ActivoNombre == "Peso Argentino")
+                    if (activoEgr.ActivoNombre == "Peso Argentino")
                     {
                         tipoActivo = "BLUE";
                     }
@@ -351,7 +337,7 @@ namespace AppFinanzasWeb.Controllers
                         tipoActivo = null;
                     }
 
-                    CotizacionActivo cotizacion = await repositorioCotizacionesActivos.GetUltimaCotizPorMoneda((int)viewModel.IdActivoEgr,tipoActivo);
+                    CotizacionActivo cotizacion = await repositorioCotizacionesActivos.GetUltimaCotizPorMoneda((int)viewModel.IdActivoEgr, tipoActivo);
 
 
                     Movimiento movimientoEgr = new Movimiento
@@ -370,6 +356,24 @@ namespace AppFinanzasWeb.Controllers
 
                     await repositorioMovimientos.InsertarMovimiento(movimientoEgr);
                 }
+
+                Movimiento movimientoIng = new Movimiento
+                {
+                    IdMovimiento = idMovimiento,
+                    IdCuenta = (int)viewModel.IdCuentaIng,
+                    IdActivo = (int)viewModel.IdActivoIng,
+                    TipoMovimiento = "Ingreso",
+                    IdClaseMovimiento = null,
+                    Comentario = viewModel.TipoComercio,
+                    Monto = (decimal)viewModel.CantidadIng,
+                    Fecha = (DateTime)viewModel.Fecha,
+                    PrecioCotiz = cotiz,
+                    ActivoNombre = activoIng.ActivoNombre
+                };
+
+                await repositorioMovimientos.InsertarMovimiento(movimientoIng);
+
+                
             }
             else if (viewModel.TipoMovimiento == "Egreso")
             {
@@ -382,25 +386,7 @@ namespace AppFinanzasWeb.Controllers
                     return RedirectToAction("NoEncontrado", "Home");
                 }
 
-                decimal cotiz =  Convert.ToDecimal(viewModel.CotizacionEgr);
-
-                Movimiento movimientoEgr = new Movimiento
-                {
-                    IdMovimiento = idMovimiento,
-                    IdCuenta = (int)viewModel.IdCuentaEgr,
-                    IdActivo = (int)viewModel.IdActivoEgr,
-                    TipoMovimiento = "Egreso",
-                    IdClaseMovimiento = null,
-                    Comentario = viewModel.TipoComercio,
-                    Monto = (decimal)viewModel.CantidadEgr,
-                    Fecha = viewModel.Fecha,
-                    PrecioCotiz = cotiz,
-                    ActivoNombre = activoEgr.ActivoNombre
-                };
-
-                await repositorioMovimientos.InsertarMovimiento(movimientoEgr);
-
-                if(viewModel.TipoComercio == "Comercio Fiat/Cripto")
+                if (viewModel.TipoComercio == "Comercio Fiat/Cripto")
                 {
                     Activo activoIng = await repositorioActivos.ObtenerPorId((int)viewModel.IdActivoIng);
                     Cuenta cuentaIng = await repositorioCuentas.ObtenerPorId((int)viewModel.IdCuentaIng);
@@ -421,9 +407,7 @@ namespace AppFinanzasWeb.Controllers
                         tipoActivo = null;
                     }
 
-
                     CotizacionActivo cotizacion = await repositorioCotizacionesActivos.GetUltimaCotizPorMoneda((int)viewModel.IdActivoIng, tipoActivo);
-
 
                     Movimiento movimientoIng = new Movimiento
                     {
@@ -441,6 +425,24 @@ namespace AppFinanzasWeb.Controllers
 
                     await repositorioMovimientos.InsertarMovimiento(movimientoIng);
                 }
+
+                decimal cotiz =  Convert.ToDecimal(viewModel.CotizacionEgr);
+
+                Movimiento movimientoEgr = new Movimiento
+                {
+                    IdMovimiento = idMovimiento,
+                    IdCuenta = (int)viewModel.IdCuentaEgr,
+                    IdActivo = (int)viewModel.IdActivoEgr,
+                    TipoMovimiento = "Egreso",
+                    IdClaseMovimiento = null,
+                    Comentario = viewModel.TipoComercio,
+                    Monto = (decimal)viewModel.CantidadEgr,
+                    Fecha = viewModel.Fecha,
+                    PrecioCotiz = cotiz,
+                    ActivoNombre = activoEgr.ActivoNombre
+                };
+
+                await repositorioMovimientos.InsertarMovimiento(movimientoEgr);               
 
             }
             else if (viewModel.TipoMovimiento == "Intercambio" && viewModel.TipoComercio == "Trading")
@@ -522,6 +524,146 @@ namespace AppFinanzasWeb.Controllers
             if (!ModelState.IsValid)
             {
                 return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            var idMovimiento = await repositorioMovimientos.ObtenerIdMaximo() + 1;
+
+            if (viewModel.TipoMovimiento == "Ingreso")
+            {
+                Activo activoIng = await repositorioActivos.ObtenerPorId((int)viewModel.IdActivoIng);
+                Cuenta cuentaIng = await repositorioCuentas.ObtenerPorId((int)(viewModel.IdCuentaIng));
+
+                if (activoIng is null || cuentaIng is null)
+                {
+                    return RedirectToAction("NoEncontrado", "Home");
+                }
+
+                if (viewModel.TipoComercio == "General")
+                {
+
+                    Activo activoEgr = await repositorioActivos.ObtenerPorId((int)viewModel.IdActivoEgr);
+                    Cuenta cuentaEgr = await repositorioCuentas.ObtenerPorId((int)viewModel.IdCuentaEgr);
+                    ClaseMovimiento claseInversion = await repositorioClaseMovimientos.ObtenerPorDescripcion("Inversiones");
+
+                    if (activoEgr is null || cuentaEgr is null || claseInversion is null)
+                    {
+                        return RedirectToAction("NoEncontrado", "Home");
+                    }
+                    string tipoActivo;
+                    if (activoEgr.ActivoNombre == "Peso Argentino")
+                    {
+                        tipoActivo = "BLUE";
+                    }
+                    else
+                    {
+                        tipoActivo = null;
+                    }
+
+                    CotizacionActivo cotizacion = await repositorioCotizacionesActivos.GetUltimaCotizPorMoneda((int)viewModel.IdActivoEgr, tipoActivo);
+
+                    Movimiento movimientoEgr = new Movimiento
+                    {
+                        IdMovimiento = idMovimiento + 1,
+                        IdCuenta = (int)viewModel.IdCuentaEgr,
+                        IdActivo = (int)viewModel.IdActivoEgr,
+                        TipoMovimiento = "Egreso",
+                        IdClaseMovimiento = claseInversion.Id,
+                        Comentario = viewModel.TipoComercio,
+                        Monto = (decimal)viewModel.CantidadEgr,
+                        Fecha = viewModel.Fecha,
+                        PrecioCotiz = Convert.ToDecimal(cotizacion.Valor),
+                        ActivoNombre = activoEgr.ActivoNombre
+                    };
+
+                    await repositorioMovimientos.InsertarMovimiento(movimientoEgr);
+                }
+
+                decimal cotiz = Convert.ToDecimal(viewModel.CotizacionIng);
+
+                Movimiento movimientoIng = new Movimiento
+                {
+                    IdMovimiento = idMovimiento,
+                    IdCuenta = (int)viewModel.IdCuentaIng,
+                    IdActivo = (int)viewModel.IdActivoIng,
+                    TipoMovimiento = "Ingreso",
+                    IdClaseMovimiento = null,
+                    Comentario = viewModel.TipoComercio,
+                    Monto = (decimal)viewModel.CantidadIng,
+                    Fecha = (DateTime)viewModel.Fecha,
+                    PrecioCotiz = cotiz,
+                    ActivoNombre = activoIng.ActivoNombre
+                };
+
+                await repositorioMovimientos.InsertarMovimiento(movimientoIng);               
+
+            }
+            else if(viewModel.TipoMovimiento == "Egreso")
+            {
+                Activo activoEgr = await repositorioActivos.ObtenerPorId((int)viewModel.IdActivoEgr);
+                Cuenta cuentaEgr = await repositorioCuentas.ObtenerPorId((int)(viewModel.IdCuentaEgr));
+
+                if (activoEgr is null || cuentaEgr is null)
+                {
+                    return RedirectToAction("NoEncontrado", "Home");
+                }
+
+                if (viewModel.TipoComercio == "General")
+                {
+
+                    Activo activoIng = await repositorioActivos.ObtenerPorId((int)viewModel.IdActivoIng);
+                    Cuenta cuentaIng = await repositorioCuentas.ObtenerPorId((int)viewModel.IdCuentaIng);
+                    ClaseMovimiento claseInversion = await repositorioClaseMovimientos.ObtenerPorDescripcion("Ingreso Inversiones");
+
+                    if (activoIng is null || cuentaIng is null || claseInversion is null)
+                    {
+                        return RedirectToAction("NoEncontrado", "Home");
+                    }
+                    string tipoActivo;
+                    if (activoIng.ActivoNombre == "Peso Argentino")
+                    {
+                        tipoActivo = "BLUE";
+                    }
+                    else
+                    {
+                        tipoActivo = null;
+                    }
+
+                    CotizacionActivo cotizacion = await repositorioCotizacionesActivos.GetUltimaCotizPorMoneda((int)viewModel.IdActivoIng, tipoActivo);
+
+                    Movimiento movimientoIng = new Movimiento
+                    {
+                        IdMovimiento = idMovimiento + 1,
+                        IdCuenta = (int)viewModel.IdCuentaIng,
+                        IdActivo = (int)viewModel.IdActivoIng,
+                        TipoMovimiento = "Ingreso",
+                        IdClaseMovimiento = claseInversion.Id,
+                        Comentario = viewModel.TipoComercio,
+                        Monto = (decimal)viewModel.CantidadIng,
+                        Fecha = viewModel.Fecha,
+                        PrecioCotiz = Convert.ToDecimal(cotizacion.Valor),
+                        ActivoNombre = activoIng.ActivoNombre
+                    };
+
+                    await repositorioMovimientos.InsertarMovimiento(movimientoIng);
+                }
+
+                decimal cotiz = Convert.ToDecimal(viewModel.CotizacionEgr);
+
+                Movimiento movimientoEgr = new Movimiento
+                {
+                    IdMovimiento = idMovimiento,
+                    IdCuenta = (int)viewModel.IdCuentaEgr,
+                    IdActivo = (int)viewModel.IdActivoEgr,
+                    TipoMovimiento = "Egreso",
+                    IdClaseMovimiento = null,
+                    Comentario = viewModel.TipoComercio,
+                    Monto = (decimal)viewModel.CantidadEgr,
+                    Fecha = (DateTime)viewModel.Fecha,
+                    PrecioCotiz = cotiz,
+                    ActivoNombre = activoEgr.ActivoNombre
+                };
+
+                await repositorioMovimientos.InsertarMovimiento(movimientoEgr);
             }
 
             TempData["SuccessMessage"] = "Movimiento registrado con éxito.";

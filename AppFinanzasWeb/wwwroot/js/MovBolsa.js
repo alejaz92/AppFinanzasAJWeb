@@ -2,21 +2,36 @@
     const tipoMovimiento = document.getElementById('TipoMovimiento').value;
     const tipoComercio = document.getElementById('TipoComercio').value;
 
+
     const grupoIngresos = document.getElementById('IngresoGroup');
     const grupoEgresos = document.getElementById('EgresoGroup');
+    const grupoCotizacionIng = document.getElementById('CotizacionIngGroup');
+    const grupoCotizacionEgr = document.getElementById('CotizacionEgrGroup');
 
     if (tipoMovimiento === 'Ingreso' && tipoComercio === 'AjusteSaldos') {
         grupoEgresos.style.display = 'none';
         grupoIngresos.style.display = 'flex';
+        grupoCotizacionIng.style.display = 'block';
+        grupoCotizacionEgr.style.display = 'none';
+
     }else if (tipoMovimiento === 'Ingreso' && tipoComercio === 'General') {
         grupoEgresos.style.display = 'flex';
         grupoIngresos.style.display = 'flex';
+        grupoCotizacionIng.style.display = 'block';
+        grupoCotizacionEgr.style.display = 'none';
+
     } else if (tipoMovimiento === 'Egreso' && tipoComercio === 'AjusteSaldos') {
         grupoEgresos.style.display = 'flex';
         grupoIngresos.style.display = 'none';
+
+        grupoCotizacionIng.style.display = 'none';
+        grupoCotizacionEgr.style.display = 'block';
+
     } else if (tipoMovimiento === 'Egreso' && tipoComercio === 'General') {
         grupoEgresos.style.display = 'flex';
         grupoIngresos.style.display = 'flex';
+        grupoCotizacionIng.style.display = 'none';
+        grupoCotizacionEgr.style.display = 'block';
     } else {
         grupoEgresos.style.display = 'none';
         grupoIngresos.style.display = 'none';
