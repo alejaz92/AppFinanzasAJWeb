@@ -1,0 +1,93 @@
+﻿@model AppFinanzasWeb.ViewModels.IntMonedasViewModel
+@{
+    ViewData["Title"] = "Nuevo Intercambio de Monedas";
+}
+<h1>Nuevo intercambio de Monedas</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<div class="container mt-4">
+    <form asp-action="IntMoneda" method="post" onsubmit="return checkSubmit()">
+        <div class="row  mb-3">
+            <div class="col-md-6">
+                <label for="Fecha" class="form-label">Fecha</label>
+                <input class="form-control" asp-for="Fecha" type="date" id="Fecha" />
+            </div>
+        </div>
+        <div class="row mb-3" id="EgresoGroup">
+            <div class="col-12">
+                <h4>Egreso</h4>
+            </div>
+            <div class="col-md-6">
+                <label for="IdActivoEgr" class="form-label">Activo</label>
+                <select asp-for="IdActivoEgr" class="form-control" id="IdActivoEgr">
+                    <option value="">Seleccione</option>
+                    @foreach (var activo in ViewBag.ActivosMoneda)
+                    {
+                        <option value="@activo.Id">@activo.ActivoNombre</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="IdCuentaEgr" class="form-label">Cuenta</label>
+                <select asp-for="IdCuentaEgr" class="form-control" id="IdCuentaEgr">
+                    <option value="">Seleccione</option>
+                    @foreach (var cuenta in ViewBag.CuentasMoneda)
+                    {
+                        <option value="@cuenta.Id">@cuenta.CuentaNombre</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="CantidadEgr" class="form-label">Monto</label>
+                <input class="form-control" asp-for="CantidadEgr" type="text" id="CantidadEgr" />
+            </div>
+
+        </div>
+
+        <div class="row mb-3" id="IngresoGroup">
+            <div class="col-12">
+                <h4>Ingreso</h4>
+            </div>
+            <div class="col-md-6">
+                <label for="IdActivoIng" class="form-label">Activo</label>
+                <select asp-for="IdActivoIng" class="form-control" id="IdActivoIng">
+                    <option value="">Seleccione</option>
+                    @foreach (var activo in ViewBag.ActivosMoneda)
+                    {
+                        <option value="@activo.Id">@activo.ActivoNombre</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="IdCuentaIng" class="form-label">Cuenta</label>
+                <select asp-for="IdCuentaIng" class="form-control" id="IdCuentaIng">
+                    <option value="">Seleccione</option>
+                    @foreach (var cuenta in ViewBag.CuentasMoneda)
+                    {
+                        <option value="@cuenta.Id">@cuenta.CuentaNombre</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="CantidadIng" class="form-label">Monto</label>
+                <input class="form-control" asp-for="CantidadIng" type="text" id="CantidadIng" />
+            </div>
+        </div>
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Insertar</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="~/js/IntMoneda.js" asp-append-version="true"></script>
+
+}
