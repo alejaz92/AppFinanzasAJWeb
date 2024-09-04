@@ -39,7 +39,7 @@ namespace AppFinanzasWeb.Servicios
 	                        T2.FECHA MesPrimerCuota , 
 	                        CASE WHEN repite = 'SI' THEN 'NA' ELSE CAST( T3.FECHA AS VARCHAR) END UltCuotaTexto, 
 	                        FT.montoCuota MontoCuota
-                        FROM [dbo].[Fact_Tarjetas2] FT 
+                        FROM [dbo].[Fact_Tarjetas] FT 
                         INNER JOIN Dim_Tarjeta T ON T.idTarjeta = FT.idTarjeta 
                         INNER JOIN Dim_ClaseMovimiento CM ON CM.idClaseMovimiento = ft.idClaseMovimiento 
                         INNER JOIN Dim_Activo A ON A.idActivo = FT.idActivo 
@@ -62,7 +62,7 @@ namespace AppFinanzasWeb.Servicios
             using var connection = new SqlConnection(connectionString);
 
             var sql = @"SELECT COUNT(*) 
-                        FROM [dbo].[Fact_Tarjetas2] FT INNER JOIN [dbo].[Dim_Tiempo] T ON FT.mesUltimaCuota = T.idFecha 
+                        FROM [dbo].[Fact_Tarjetas] FT INNER JOIN [dbo].[Dim_Tiempo] T ON FT.mesUltimaCuota = T.idFecha 
                         WHERE FT.repite = 'SI' OR DATEADD(month ,1, T.FECHA) >= GETDATE()";
 
             return await connection.ExecuteScalarAsync<int>(sql);
@@ -72,7 +72,7 @@ namespace AppFinanzasWeb.Servicios
         {
             using var connection = new SqlConnection(connectionString);
 
-            var sql = @"INSERT INTO [dbo].[Fact_Tarjetas2]
+            var sql = @"INSERT INTO [dbo].[Fact_Tarjetas]
                            ([fechaMov]
                            ,[detalle]
                            ,[idTarjeta]
@@ -120,7 +120,7 @@ namespace AppFinanzasWeb.Servicios
                           ,[repite] Repite
                           ,[montoCuota] MontoCuota
 	                      , T.nombre NombreTarj
-                      FROM [dbo].[Fact_Tarjetas2] FT
+                      FROM [dbo].[Fact_Tarjetas] FT
                       INNER JOIN [dbo].[Dim_Tarjeta] T ON T.idTarjeta = FT.idTarjeta
                       INNER JOIN [dbo].[Dim_ClaseMovimiento] CM ON CM.idClaseMovimiento = FT.idClaseMovimiento
                       INNER JOIN [dbo].[Dim_Activo] A ON A.idActivo = FT.idActivo
@@ -136,7 +136,7 @@ namespace AppFinanzasWeb.Servicios
         {
             using var connection = new SqlConnection(connectionString);
 
-            await connection.ExecuteAsync("UPDATE Fact_Tarjetas2 SET repite = 'Cerrado' WHERE IdMovimiento = @Id", new { id });
+            await connection.ExecuteAsync("UPDATE Fact_Tarjetas SET repite = 'Cerrado' WHERE IdMovimiento = @Id", new { id });
         }
 
         public async Task<IEnumerable<MovTarjeta>> ObtenerMovimientosPago(int IdTarjeta, string FechaPago)

@@ -41,7 +41,7 @@ namespace AppFinanzasWeb.Servicios
 	                        A.nombre ActivoNombre, 
 	                        CAST(MO.monto AS decimal (18,2)) MONTO, 
 	                        MO.IDMOVIMIENTO 
-                        FROM [dbo].[Fact_Movimiento2] MO 
+                        FROM [dbo].[Fact_Movimiento] MO 
                         INNER JOIN [dbo].[Dim_ClaseMovimiento] CM ON CM.idClaseMovimiento = MO.idClaseMovimiento 
                         INNER JOIN Dim_Activo A ON A.idActivo = MO.idActivo 
                         INNER JOIN Dim_Cuenta C ON C.idCuenta = MO.idCuenta 
@@ -60,7 +60,7 @@ namespace AppFinanzasWeb.Servicios
         public async Task<int> ObtenerTotalMovimientos()
         {
             using var connection = new SqlConnection(connectionString);
-            var sql = "SELECT COUNT(*) FROM Fact_Movimiento2 WHERE idClaseMovimiento IS NOT NULL";
+            var sql = "SELECT COUNT(*) FROM Fact_Movimiento WHERE idClaseMovimiento IS NOT NULL";
             return await connection.ExecuteScalarAsync<int>(sql);
         }
 
@@ -68,7 +68,7 @@ namespace AppFinanzasWeb.Servicios
         {
             using var conection = new SqlConnection(connectionString);
 
-            var sql = "SELECT ISNULL(MAX(idMovimiento), 0) FROM Fact_Movimiento2";
+            var sql = "SELECT ISNULL(MAX(idMovimiento), 0) FROM Fact_Movimiento";
             return await conection.ExecuteScalarAsync<int>(sql);
         }
 
@@ -98,7 +98,7 @@ namespace AppFinanzasWeb.Servicios
 
             string fecha = movimiento.Fecha.ToString("yyyyMMdd");
 
-            var sql = "INSERT INTO Fact_Movimiento2 (IdMovimiento, idCuenta, idActivo, idFecha, tipoMovimiento, " +
+            var sql = "INSERT INTO Fact_Movimiento (IdMovimiento, idCuenta, idActivo, idFecha, tipoMovimiento, " +
                        " idClaseMovimiento, comentario, monto, precioCotiz) VALUES (@IdMovimiento, @IdCuenta, @IdActivo, " + fecha  + " , " + 
                        " @TipoMovimiento, @IdClaseMovimiento, @Comentario, @Monto, " + sqlPrecioCotiz + ")";
 
@@ -109,7 +109,7 @@ namespace AppFinanzasWeb.Servicios
         public async Task Borrar(int id)
         {
             using var connection = new SqlConnection(connectionString);
-            await connection.ExecuteAsync("DELETE FROM Fact_Movimiento2 WHERE idMovimiento = @Id", new {id});
+            await connection.ExecuteAsync("DELETE FROM Fact_Movimiento WHERE idMovimiento = @Id", new {id});
 
         }
 
@@ -117,7 +117,7 @@ namespace AppFinanzasWeb.Servicios
         {
             using var connection = new SqlConnection(connectionString);
 
-            await connection.ExecuteAsync("UPDATE Fact_Movimiento2 SET monto = @Monto WHERE idMovimiento = @Id",
+            await connection.ExecuteAsync("UPDATE Fact_Movimiento SET monto = @Monto WHERE idMovimiento = @Id",
                     new { monto, id });
         }
 
@@ -139,7 +139,7 @@ namespace AppFinanzasWeb.Servicios
 	                                                                        FM.comentario Comentario,
 	                                                                        FM.Monto Monto, 
 	                                                                        FM.precioCotiz PrecioCotiz
-                                                                        FROM [dbo].[Fact_Movimiento2] FM
+                                                                        FROM [dbo].[Fact_Movimiento] FM
                                                                         INNER JOIN [dbo].[Dim_Activo] A ON A.idActivo = FM.idActivo
                                                                         INNER JOIN [dbo].[Dim_Cuenta] C ON C.idCuenta = FM.idCuenta
                                                                         INNER JOIN [dbo].[Dim_Tiempo] T ON T.idFecha = FM.idFecha
