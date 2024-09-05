@@ -184,7 +184,9 @@ namespace AppFinanzasWeb.Controllers
 
             var viewModel = new MovimientoReintegroViewModel
             {
-                movimiento = movimiento
+                movimiento = movimiento,
+                cuentaReint = movimiento.IdCuenta,
+                fechaReint = movimiento.Fecha
             };
 
             return View(viewModel);
