@@ -1,0 +1,133 @@
+﻿@model AppFinanzasWeb.ViewModels.SaldosViewModel
+
+@{
+    ViewData["Title"] = "Saldos";
+}
+<div class="container mt-4">
+    <h1>Saldos</h1>
+
+    <div class="row">
+        <!-- saldos destacados -->
+        <div class="col-12 col-md-6">
+            <div class="card text-white bg-info mb-3 text-center">
+                <div class="card-header">
+                    Saldo en Pesos
+                </div>
+                <div class="card-body">
+                    <h4 class="card-title">@Model.SaldoPesos</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+            <div class="card text-white bg-success mb-3 text-center">
+                <div class="card-header">Saldo en Dólares</div>
+                <div class="card-body">
+                    <h4 class="card-title">@Model.SaldoDolares</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-md-6 mb-3">
+            <label for="tipoActivo" class="form-label">
+                Tipo de Activo
+            </label>
+            <select  class="form-select" id="TipoActivo" onchange="updateTipoActivo()" asp-for="tipoActivo">
+                <option>Seleccione</option>
+                @foreach (var tipoActivo in ViewBag.TiposActivo)
+                {
+                    <option value="@tipoActivo.Id">@tipoActivo.Nombre</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-12 col-md-6 mb-3">
+            <label for="activo" class="form-label">Activo</label>
+            <select id="activo" class="form-select" onchange="actualizarTablas()"
+                    data-cripto='@Html.Raw(Json.Serialize(ViewBag.ActivosCripto))'
+                    data-accion='@Html.Raw(Json.Serialize(ViewBag.ActivosAccion))'
+                    data-bonos='@Html.Raw(Json.Serialize(ViewBag.ActivosBonos))'
+                    data-cedear='@Html.Raw(Json.Serialize(ViewBag.ActivosCEDEAR))'
+                    data-fci='@Html.Raw(Json.Serialize(ViewBag.ActivosFCI))'
+                    data-moneda='@Html.Raw(Json.Serialize(ViewBag.ActivosMoneda))' asp-for="activo">
+                <option value="">Seleccione</option>
+                <!-- Opciones cargadas dinámicamente según el tipo de activo -->
+            </select>
+        </div>
+    </div>
+
+
+        <div class="row" id="tablaSaldos">
+            @* <div class="col-12">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Cuenta</th>
+                            <th scope="col">Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detalleCuentas">
+                        @foreach (var cuenta in Model.CuentaMontos)
+                        {
+                            <tr>
+                                <th scope="col">@cuenta.Cuenta</th>
+                                <th scope="col">@cuenta.Monto</th>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div> *@
+        </div>
+   
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="~/js/saldos.js" asp-append-version="true"></script>
+
+    <script>
+        function actualizarTablas() {
+            var idActivo = $("#activo").val();
+
+
+            if (idActivo) {
+                $.post('@Url.Action("ActualizarTablasSaldos")', { idActivo: idActivo }, function (data) {
+                    var table = $('#tablaSaldos');
+                    table.empty();
+                    var tableTotal = '';
+                    var baseTable = '<div class="col-12">' +
+                        '<table class="table table-striped">' +
+                        '<thead>' +
+                        '<tr>' +
+                        '<th scope="col">Cuenta</th>' +
+                        '<th scope"col">Saldo</th>' +
+                        '</tr>' +
+                        '</thead>' +
+                        '<tbody id="detalleCuentas">';
+                    tableTotal = baseTable;
+
+                    $.each(data, function (i, cuenta) {
+                        var row = '<tr>' +
+                            '<th scope="col">' + cuenta.cuenta + '</th>' +
+                            '<th scope="col">' + cuenta.monto + '</th>' +
+                            '</tr>';
+
+                        tableTotal = tableTotal + row;
+                    });
+
+                    baseTable = '</tbody>' +
+                        '</table>' +
+                        '</div>';
+
+                    tableTotal = tableTotal + baseTable;
+
+                    table.append(tableTotal);
+                });
+            }
+        }
+    </script>
+
+}

@@ -34,6 +34,37 @@ function formatearMoneda(input) {
     }
 }
 
+function formatearActivo(input) {
+    // Reemplazar punto o coma por punto para el parseo
+    let valor = removePoints(input.value)
+
+    valor = valor.replace(/[^0-9.,]/g, '').replace(',', '.');
+
+
+    // Convertir el valor a número flotante
+    let numero = parseFloat(valor);
+
+
+
+    if (!isNaN(numero)) {
+        // Formatear el número con puntos y comas
+        let valorFormateado = numero.toLocaleString('es-ES', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 18,
+            //useGrouping: true
+        });
+
+
+
+        // Actualizar el valor del campo input visible
+        input.value = valorFormateado;
+
+    } else {
+        // Si no es un número válido, limpiar los valores
+        input.value = '';
+    }
+}
+
 function removePoints(str) {
     //posicion del coma decimal
     var lastIndex = str.lastIndexOf('.');

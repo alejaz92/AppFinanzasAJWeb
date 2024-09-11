@@ -241,6 +241,9 @@ function checkSubmit() {
     const CotizacionIng = document.getElementById('CotizacionIng');
 
 
+    console.log(CantidadEgr.value);
+    console.log(CantidadIng.value);
+
     if (fecha === "") {
         alert('Seleccione una fecha válida');
         return false;

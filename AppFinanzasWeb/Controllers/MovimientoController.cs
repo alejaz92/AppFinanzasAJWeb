@@ -350,7 +350,7 @@ namespace AppFinanzasWeb.Controllers
                         TipoMovimiento = "Egreso",
                         IdClaseMovimiento = claseInversion.Id,
                         Comentario = viewModel.TipoComercio,
-                        Monto = -(decimal)viewModel.CantidadEgr,
+                        Monto = -Convert.ToDecimal((string)viewModel.CantidadEgr),
                         Fecha = viewModel.Fecha,
                         PrecioCotiz = Convert.ToDecimal(cotizacion.Valor),
                         ActivoNombre = activoEgr.ActivoNombre
@@ -367,7 +367,7 @@ namespace AppFinanzasWeb.Controllers
                     TipoMovimiento = "Ingreso",
                     IdClaseMovimiento = null,
                     Comentario = viewModel.TipoComercio,
-                    Monto = (decimal)viewModel.CantidadIng,
+                    Monto = Convert.ToDecimal((string)viewModel.CantidadIng),
                     Fecha = (DateTime)viewModel.Fecha,
                     PrecioCotiz = cotiz,
                     ActivoNombre = activoIng.ActivoNombre
@@ -419,7 +419,7 @@ namespace AppFinanzasWeb.Controllers
                         TipoMovimiento = "Ingreso",
                         IdClaseMovimiento = claseInversion.Id,
                         Comentario = viewModel.TipoComercio,
-                        Monto = (decimal)viewModel.CantidadIng,
+                        Monto = Convert.ToDecimal((string)viewModel.CantidadIng),
                         Fecha = viewModel.Fecha,
                         PrecioCotiz = Convert.ToDecimal(cotizacion.Valor),
                         ActivoNombre = activoIng.ActivoNombre
@@ -438,7 +438,7 @@ namespace AppFinanzasWeb.Controllers
                     TipoMovimiento = "Egreso",
                     IdClaseMovimiento = null,
                     Comentario = viewModel.TipoComercio,
-                    Monto = -(decimal)viewModel.CantidadEgr,
+                    Monto = -Convert.ToDecimal((string)viewModel.CantidadEgr),
                     Fecha = viewModel.Fecha,
                     PrecioCotiz = cotiz,
                     ActivoNombre = activoEgr.ActivoNombre
@@ -469,7 +469,7 @@ namespace AppFinanzasWeb.Controllers
                     TipoMovimiento = "Ingreso",
                     IdClaseMovimiento = null,
                     Comentario = viewModel.TipoComercio,
-                    Monto = (decimal)viewModel.CantidadIng,
+                    Monto = Convert.ToDecimal((string)viewModel.CantidadIng),
                     Fecha = viewModel.Fecha,
                     PrecioCotiz = cotizIng,
 
@@ -488,7 +488,7 @@ namespace AppFinanzasWeb.Controllers
                     TipoMovimiento = "Egreso",
                     IdClaseMovimiento = null,
                     Comentario = viewModel.TipoComercio,
-                    Monto = -(decimal)viewModel.CantidadEgr,
+                    Monto = -Convert.ToDecimal((string)viewModel.CantidadEgr),
                     Fecha = viewModel.Fecha,
                     PrecioCotiz = cotizEgr
                 };

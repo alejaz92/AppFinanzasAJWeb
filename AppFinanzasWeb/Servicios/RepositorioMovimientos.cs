@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Data.SqlTypes;
 using Microsoft.Identity.Client;
 using System.Globalization;
+using AppFinanzasWeb.Models.DTO;
 
 namespace AppFinanzasWeb.Servicios
 {
@@ -17,6 +18,9 @@ namespace AppFinanzasWeb.Servicios
         Task<Movimiento> ObtenerPorId(int id);
         Task<int> ObtenerTotalMovimientos();
         Task Actualizar(int id, decimal monto);
+        Task<decimal> getTotalEnPesos();
+        Task<decimal> getTotalEnDolares();
+        Task<IEnumerable<CuentaMontoDTO>> GetMontosPorCuenta(int idActivo);
     }
 
     public class RepositorioMovimientos : IRepositorioMovimientos
@@ -146,6 +150,43 @@ namespace AppFinanzasWeb.Servicios
                                                                         LEFT JOIN [dbo].[Dim_ClaseMovimiento] CM ON CM.idClaseMovimiento = FM.idClaseMovimiento
                                                                         WHERE FM.idMovimiento = @Id
                                                                         ", new { id });
-            }
+        }
+
+        public async Task<decimal> getTotalEnPesos()
+        {
+            using var connection = new SqlConnection(connectionString);
+            var sql = "SELECT CAST( SUM( CASE WHEN A.esReferencia = 1 THEN MONTO ELSE CASE WHEN " +
+                    "CA.valor IS NOT NULL THEN MONTO / CA.VALOR ELSE 0 END END) AS DECIMAL (18,2)) * " +
+                    "(SELECT VALOR FROM [dbo].[Cotizacion_Activo] WHERE TIPO = 'BLUE' AND IDFECHA = (SELECT " +
+                    "MAX(IDFECHA) FROM [dbo].[Cotizacion_Activo])) TOT FROM [dbo].[Fact_Movimiento] M INNER JOIN " +
+                    "Dim_Activo A ON M.idActivo = A.idActivo LEFT JOIN [dbo].[Cotizacion_Activo] CA ON " +
+                    "CA.idActivoComp = A.idActivo AND CA.idFecha = (SELECT MAX(IDFECHA) FROM " +
+                    "[dbo].[Cotizacion_Activo]) AND CA.tipo <> 'TARJETA' AND CA.tipo <> 'BOLSA'";
+            return await connection.ExecuteScalarAsync<decimal>(sql);
+        }
+
+        public async Task<decimal> getTotalEnDolares()
+        {
+            using var connection = new SqlConnection(connectionString);
+            var sql = "SELECT CAST( SUM( CASE WHEN A.esReferencia = 1 THEN MONTO ELSE CASE WHEN " +
+                    "CA.valor IS NOT NULL THEN MONTO / CA.VALOR ELSE 0 END END) AS DECIMAL (18,2)) tot FROM " +
+                    "[dbo].[Fact_Movimiento] M INNER JOIN Dim_Activo A ON M.idActivo = A.idActivo LEFT JOIN " +
+                    "[dbo].[Cotizacion_Activo] CA ON CA.idActivoComp = A.idActivo AND CA.idFecha = (SELECT " +
+                    "MAX(IDFECHA) FROM [dbo].[Cotizacion_Activo]) AND CA.tipo <> 'TARJETA' AND CA.tipo <> " +
+                    "'BOLSA'";
+            return await connection.ExecuteScalarAsync<decimal>(sql);
+        }
+
+        public async Task<IEnumerable<CuentaMontoDTO>> GetMontosPorCuenta(int idActivo)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var sql = "SELECT C.nombre Cuenta, SUM(FM.MONTO)  Monto FROM " +
+                        "[dbo].[Fact_Movimiento] FM INNER JOIN [dbo].[Dim_Activo] A ON A.idActivo = FM.idActivo INNER " +
+                        "JOIN [dbo].[Dim_Cuenta] C ON C.idCuenta = FM.idCuenta WHERE A.idActivo = @idActivo " +
+                        "GROUP BY C.nombre HAVING SUM(FM.MONTO) > 0";
+
+            return await connection.QueryAsync<CuentaMontoDTO>(sql, new { idActivo });
+        }
     }
 }

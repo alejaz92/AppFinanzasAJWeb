@@ -62,11 +62,11 @@
                 </div>
                 <div class="col-md-6">
                     <label for="CantidadEgr" class="form-label">Cantidad</label>
-                    <input class="form-control" asp-for="CantidadEgr" type="text" id="CantidadEgr" />
+                    <input class="form-control" asp-for="CantidadEgr" type="text" id="CantidadEgr" onblur="formatearActivo(this)" />
                 </div>
                 <div class="col-md-6" id="CotizacionEgrGroup">
                     <label for="CotizacionEgr" class="form-label">Cotización en USD</label>
-                    <input class="form-control" asp-for="CotizacionEgr" type="text" id="CotizacionEgr" />
+                    <input class="form-control" asp-for="CotizacionEgr" type="text" id="CotizacionEgr" onblur="formatearActivo(this)" />
                 </div>
             </div>
 
@@ -92,11 +92,11 @@
                 </div>
                 <div class="col-md-6">
                     <label for="CantidadIng" class="form-label">Cantidad</label>
-                    <input class="form-control" asp-for="CantidadIng" type="text" id="CantidadIng" />
+                    <input class="form-control" asp-for="CantidadIng" type="text" id="CantidadIng" onblur="formatearActivo(this)" />
                 </div>
                 <div class="col-md-6" id="CotizacionIngGroup">
                     <label for="CotizacionIng" class="form-label">Cotización en USD</label>
-                    <input class="form-control" asp-for="CotizacionIng" type="text" id="CotizacionIng" />
+                    <input class="form-control" asp-for="CotizacionIng" type="text" id="CotizacionIng" onblur="formatearActivo(this)" />
                 </div>
             </div>
 
