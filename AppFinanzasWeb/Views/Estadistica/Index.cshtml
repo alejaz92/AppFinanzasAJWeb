@@ -1,0 +1,68 @@
+﻿
+@{
+    ViewData["Title"] = "Reportes y Estadistica";
+    var mesActual = ViewBag.MesActual;
+}
+
+<div class="container mt-4">
+    <h1>Reportes y Estadistica</h1>
+
+    <!-- Navegación de Tabs -->
+    <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="ingEgrDolar-tab" data-bs-toggle="tab" href="#ingEgrDolar" role="tab" aria-controls="ingEgrDolar" aria-selected="true">Ingresos y Egresos</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="dashboard2-tab" data-bs-toggle="tab" href="#dashboard2" role="tab" aria-controls="dashboard2" aria-selected="false">Dashboard 2</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="dashboard3-tab" data-bs-toggle="tab" href="#dashboard3" role="tab" aria-controls="dashboard3" aria-selected="false">Dashboard 3</a>
+        </li>
+    </ul>
+
+    <!-- contenido de los tabs -->
+    <div class="tab-content" id="dashboardTabsContent">
+        <!-- Primer tab-->
+        <div class="tab-pane fade show active" id="ingEgrDolar" role="tabpanel" aria-labelledby="ingEgrDolar-tab">
+            <div class="mt-3">
+                <h4>Ingresos y Egresos en Dolares</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="month">Mes</label>
+                        <input class="form-control" type="month" id="MesDB1" value="@ViewBag.MesActual" onchange="cargarDatosDashboard1()" />
+                    </div>
+                </div>
+
+                <!-- Graficos -->
+
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <canvas id="incomeByClassChart"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="expenseByClassChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <canvas id="incomeLast6MonthsChart"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="expenseLast6MonthsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="~/js/estadistica.js" asp-append-version="true"></script>
+
+    
+}

@@ -6,6 +6,7 @@ using System.Data.SqlTypes;
 using Microsoft.Identity.Client;
 using System.Globalization;
 using AppFinanzasWeb.Models.DTO;
+using AppFinanzasWeb.ViewModels.Estadistica;
 
 namespace AppFinanzasWeb.Servicios
 {
@@ -21,6 +22,9 @@ namespace AppFinanzasWeb.Servicios
         Task<decimal> getTotalEnPesos();
         Task<decimal> getTotalEnDolares();
         Task<IEnumerable<CuentaMontoDTO>> GetMontosPorCuenta(int idActivo);
+        Task<IEnumerable<MovimientoClaseTotalViewModel>> ObtenerIngresosPorClase(int year, int month);
+        Task<IEnumerable<int>> ObtenerAniosMovimientos();
+        Task<IEnumerable<MovimientoClaseTotalViewModel>> ObtenerEgresosPorClase(int year, int month);
     }
 
     public class RepositorioMovimientos : IRepositorioMovimientos
@@ -187,6 +191,53 @@ namespace AppFinanzasWeb.Servicios
                         "GROUP BY C.nombre HAVING SUM(FM.MONTO) > 0";
 
             return await connection.QueryAsync<CuentaMontoDTO>(sql, new { idActivo });
+        }
+
+        public async Task<IEnumerable<MovimientoClaseTotalViewModel>> ObtenerIngresosPorClase(int year, int month)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var sql = @"SELECT 
+	                        CM.descripcion ClaseMovimiento, SUM(FM.monto / FM.precioCotiz) Total
+                        FROM [dbo].[Fact_Movimiento] FM
+                        INNER JOIN Dim_ClaseMovimiento CM ON FM.idClaseMovimiento = CM.idClaseMovimiento
+                        INNER JOIN Dim_Tiempo T ON T.idFecha = FM.idFecha
+                        WHERE FM.tipoMovimiento = 'Ingreso' AND  T.anio = @Year AND T.mes = @Month
+                        GROUP BY CM.descripcion
+                        ORDER BY SUM(FM.monto / FM.precioCotiz) DESC";
+
+            return await connection.QueryAsync<MovimientoClaseTotalViewModel>(sql, new { year, month });
+        }
+
+
+        public async Task<IEnumerable<MovimientoClaseTotalViewModel>> ObtenerEgresosPorClase(int year, int month)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var sql = @"SELECT 
+	                        CM.descripcion ClaseMovimiento, - SUM(FM.monto / FM.precioCotiz) Total
+                        FROM [dbo].[Fact_Movimiento] FM
+                        INNER JOIN Dim_ClaseMovimiento CM ON FM.idClaseMovimiento = CM.idClaseMovimiento
+                        INNER JOIN Dim_Tiempo T ON T.idFecha = FM.idFecha
+                        WHERE FM.tipoMovimiento = 'Egreso' AND  T.anio = @Year AND T.mes = @Month
+                        GROUP BY CM.descripcion
+                        ORDER BY - SUM(FM.monto / FM.precioCotiz) DESC";
+
+            return await connection.QueryAsync<MovimientoClaseTotalViewModel>(sql, new { year, month });
+        }
+
+        public async Task<IEnumerable<int>> ObtenerAniosMovimientos()
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var sql = @"SELECT 
+	                        DISTINCT T.anio 
+                        FROM [dbo].[Fact_Movimiento] FM
+                        INNER JOIN Dim_Tiempo T ON T.idFecha = FM.idFecha
+                        ORDER BY T.anio DESC
+                        ";
+
+            return await connection.QueryAsync<int>(sql);
         }
     }
 }
