@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using AppFinanzasWeb.Models;
 using Microsoft.Data.SqlClient;
+using AppFinanzasWeb.ViewModels.Estadistica;
 
 namespace AppFinanzasWeb.Servicios
 {
@@ -8,6 +9,8 @@ namespace AppFinanzasWeb.Servicios
     {
         Task CerrarRecurente(int id);
         Task InsertarMovimiento(MovTarjeta movTarjeta);
+        Task<IEnumerable<MovimientoUlt6MesesViewModel>> ObtenerEstadisticaTarjetaMeses(string Tarjeta, string Moneda);
+        Task<IEnumerable<MovimientoUlt6MesesViewModel>> ObtenerEstadisticaTarjetaMesesTotal(string Moneda);
         Task<IEnumerable<MovTarjeta>> ObtenerMovimientosPaginacion(int pagina, int cantidadPorPagina);
         Task<IEnumerable<MovTarjeta>> ObtenerMovimientosPago(int IdTarjeta, string FechaPago);
         Task<MovTarjeta> ObtenerPorId(int id);
@@ -174,6 +177,71 @@ namespace AppFinanzasWeb.Servicios
                 FechaPago = FechaPago
             });
 
+        }
+
+        public async Task<IEnumerable<MovimientoUlt6MesesViewModel>> ObtenerEstadisticaTarjetaMeses(string Tarjeta, string Moneda)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var sql = @"SELECT 
+                        T.anio
+                        ,T.mes
+                        ,T.mesNombre mesNombre
+                        ,COALESCE(SUM( montoCuota), 0) Total
+                        FROM
+                        [dbo].[Dim_Tiempo] T
+                        LEFT JOIN
+                        (
+                        SELECT 
+                        FT.*,
+                        CAST(REPLACE(CAST(DATEADD(MONTH, n.Number, T1.fecha) AS NVARCHAR), '-', '') AS INT) as mes 
+                        FROM [dbo].[Fact_Tarjetas] FT
+                        INNER JOIN [dbo].[Dim_Tiempo] T1 ON T1.idFecha = FT.mesPrimerCuota
+                        INNER JOIN [dbo].[Dim_Tiempo] T2 ON T2.idFecha = FT.mesUltimaCuota
+                        INNER JOIN Dim_Tarjeta TA ON TA.idTarjeta = FT.idTarjeta AND TA.IdTarjeta  = @Tarjeta INNER 
+                        JOIN Dim_Activo A ON A.idActivo = FT.idActivo AND A.nombre = @Moneda JOIN 
+                        (
+	                        SELECT ROW_NUMBER() OVER(ORDER BY object_id) - 1 AS Number
+	                        FROM sys.objects) as n
+	                        ON  DATEADD(MONTH, N.NUMBER, T1.FECHA) <= T2.fecha  OR ft.mesUltimaCuota = 0
+                        ) T1 ON T.idFecha = T1.mes
+                        WHERE T.fecha BETWEEN DATEADD(MONTH, -6, GETDATE()) AND DATEADD(MONTH, 5, GETDATE())
+                        GROUP BY T.anio, T.mes, T.mesNombre
+                        ORDER BY T.anio, T.mes;";
+
+            return await connection.QueryAsync<MovimientoUlt6MesesViewModel>(sql, new { Tarjeta, Moneda});
+        }
+
+        public async Task<IEnumerable<MovimientoUlt6MesesViewModel>> ObtenerEstadisticaTarjetaMesesTotal(string Moneda)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var sql = @"SELECT 
+                        T.anio
+                        ,T.mes
+                        ,T.mesNombre mesNombre
+                        ,COALESCE(SUM( montoCuota), 0) Total
+                        FROM
+                        [dbo].[Dim_Tiempo] T
+                        LEFT JOIN
+                        (
+                        SELECT 
+                        FT.*,
+                        CAST(REPLACE(CAST(DATEADD(MONTH, n.Number, T1.fecha) AS NVARCHAR), '-', '') AS INT) as mes 
+                        FROM [dbo].[Fact_Tarjetas] FT
+                        INNER JOIN [dbo].[Dim_Tiempo] T1 ON T1.idFecha = FT.mesPrimerCuota
+                        INNER JOIN [dbo].[Dim_Tiempo] T2 ON T2.idFecha = FT.mesUltimaCuota            
+                        INNER JOIN Dim_Activo A ON A.idActivo = FT.idActivo AND A.nombre = @Moneda JOIN 
+                        (
+	                        SELECT ROW_NUMBER() OVER(ORDER BY object_id) - 1 AS Number
+	                        FROM sys.objects) as n
+	                        ON  DATEADD(MONTH, N.NUMBER, T1.FECHA) <= T2.fecha  OR ft.mesUltimaCuota = 0
+                        ) T1 ON T.idFecha = T1.mes
+                        WHERE T.fecha BETWEEN DATEADD(MONTH, -6, GETDATE()) AND DATEADD(MONTH, 5, GETDATE())
+                        GROUP BY T.anio, T.mes, T.mesNombre
+                        ORDER BY T.anio, T.mes;";
+
+            return await connection.QueryAsync<MovimientoUlt6MesesViewModel>(sql, new { Moneda });
         }
     }
 }

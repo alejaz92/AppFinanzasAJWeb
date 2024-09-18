@@ -33,6 +33,7 @@
         <div class="form-group mb-3">
             <label for="Activo">Moneda</label>
             <select asp-for="IdActivo" class="form-control">
+                <option value="">Seleccione</option>
                 @foreach (var activo in ViewBag.Activos)
                 {
                     <option value="@activo.Id">@activo.ActivoNombre</option>
@@ -43,6 +44,7 @@
         <div class="form-group mb-3" id="CuentaIngreso">
             <label for="IdCuentaIngreso">Cuenta de Ingreso</label>
             <select asp-for="IdCuentaIngreso" class="form-control">
+                <option value="">Seleccione</option>
                 @foreach (var cuenta in ViewBag.Cuentas)
                 {
                     <option value="@cuenta.Id">@cuenta.CuentaNombre</option>
@@ -52,6 +54,7 @@
         <div class="form-group mb-3" id="CuentaEgreso">
             <label for="IdCuentaEgreso">Cuenta de Egreso</label>
             <select asp-for="IdCuentaEgreso" class="form-control">
+                <option value="">Seleccione</option>
                 @foreach (var cuenta in ViewBag.Cuentas)
                 {
                     <option value="@cuenta.Id">@cuenta.CuentaNombre</option>
@@ -61,6 +64,7 @@
         <div class="form-group mb-3" id="ClaseIngreso">
             <label for="IdClaseMovimiento">Clase de Ingreso</label>
             <select asp-for="IdClaseIngreso" class="form-control">
+                <option value="">Seleccione</option>
                 @foreach (var clase in ViewBag.ClasesIngreso)
                 {
                     <option value="@clase.Id">@clase.ClaseMovimientoNombre</option>
@@ -70,6 +74,7 @@
         <div class="form-group mb-3" id="ClaseEgreso">
             <label for="IdClaseMovimiento">Clase de Egreso</label>
             <select asp-for="IdClaseEgreso" class="form-control">
+                <option value="">Seleccione</option>
                 @foreach (var clase in ViewBag.ClasesEgreso)
                 {
                     <option value="@clase.Id">@clase.ClaseMovimientoNombre</option>

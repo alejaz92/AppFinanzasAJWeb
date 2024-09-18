@@ -25,6 +25,12 @@ namespace AppFinanzasWeb.Servicios
         Task<IEnumerable<MovimientoClaseTotalViewModel>> ObtenerIngresosPorClase(int year, int month);
         Task<IEnumerable<int>> ObtenerAniosMovimientos();
         Task<IEnumerable<MovimientoClaseTotalViewModel>> ObtenerEgresosPorClase(int year, int month);
+        Task<IEnumerable<MovimientoUlt6MesesViewModel>> ObtenerIngresosUltMeses();
+        Task<IEnumerable<MovimientoUlt6MesesViewModel>> ObtenerEgresosUltMeses();
+        Task<IEnumerable<MovimientoClaseTotalViewModel>> ObtenerIngresosPorClasePesos(int year, int month);
+        Task<IEnumerable<MovimientoClaseTotalViewModel>> ObtenerEgresosPorClasePesos(int year, int month);
+        Task<IEnumerable<MovimientoUlt6MesesViewModel>> ObtenerIngresosUltMesesPesos();
+        Task<IEnumerable<MovimientoUlt6MesesViewModel>> ObtenerEgresosUltMesesPesos();
     }
 
     public class RepositorioMovimientos : IRepositorioMovimientos
@@ -198,7 +204,7 @@ namespace AppFinanzasWeb.Servicios
             using var connection = new SqlConnection(connectionString);
 
             var sql = @"SELECT 
-	                        CM.descripcion ClaseMovimiento, SUM(FM.monto / FM.precioCotiz) Total
+	                        CM.descripcion ClaseMovimiento, ROUND(SUM(FM.monto / FM.precioCotiz), 2) Total
                         FROM [dbo].[Fact_Movimiento] FM
                         INNER JOIN Dim_ClaseMovimiento CM ON FM.idClaseMovimiento = CM.idClaseMovimiento
                         INNER JOIN Dim_Tiempo T ON T.idFecha = FM.idFecha
@@ -209,13 +215,53 @@ namespace AppFinanzasWeb.Servicios
             return await connection.QueryAsync<MovimientoClaseTotalViewModel>(sql, new { year, month });
         }
 
+        public async Task<IEnumerable<MovimientoUlt6MesesViewModel>> ObtenerIngresosUltMeses()
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var sql = @"WITH ULTIMOSMESES AS(SELECT  TOP 6 
+	                        T.anio,
+	                        T.mes,T.mesNombre , ROUND(SUM(FM.monto / FM.precioCotiz), 2) Total
+                        FROM [dbo].[Fact_Movimiento] FM
+                        INNER JOIN Dim_ClaseMovimiento CM ON FM.idClaseMovimiento = CM.idClaseMovimiento
+                        INNER JOIN Dim_Tiempo T ON T.idFecha = FM.idFecha
+                        WHERE FM.tipoMovimiento = 'Ingreso' 
+                        GROUP BY T.ANIO, T.mes, T.mesNombre
+                        ORDER BY T.ANIO, T.mes DESC)
+                        SELECT * 
+                        FROM ULTIMOSMESES
+                        ORDER BY anio ASC, mes ASC;";
+
+            return await connection.QueryAsync<MovimientoUlt6MesesViewModel>(sql);
+        }
+
+        public async Task<IEnumerable<MovimientoUlt6MesesViewModel>> ObtenerEgresosUltMeses()
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var sql = @"WITH ULTIMOSMESES AS(SELECT  TOP 6 
+	                        T.anio,
+	                        T.mes,T.mesNombre , - ROUND(SUM(FM.monto / FM.precioCotiz), 2) Total
+                        FROM [dbo].[Fact_Movimiento] FM
+                        INNER JOIN Dim_ClaseMovimiento CM ON FM.idClaseMovimiento = CM.idClaseMovimiento
+                        INNER JOIN Dim_Tiempo T ON T.idFecha = FM.idFecha
+                        WHERE FM.tipoMovimiento = 'Egreso' 
+                        GROUP BY T.ANIO, T.mes, T.mesNombre
+                        ORDER BY T.ANIO, T.mes DESC)
+                        SELECT * 
+                        FROM ULTIMOSMESES
+                        ORDER BY anio ASC, mes ASC;";
+
+            return await connection.QueryAsync<MovimientoUlt6MesesViewModel>(sql);
+        }
+
 
         public async Task<IEnumerable<MovimientoClaseTotalViewModel>> ObtenerEgresosPorClase(int year, int month)
         {
             using var connection = new SqlConnection(connectionString);
 
             var sql = @"SELECT 
-	                        CM.descripcion ClaseMovimiento, - SUM(FM.monto / FM.precioCotiz) Total
+	                        CM.descripcion ClaseMovimiento, ROUND(- SUM(FM.monto / FM.precioCotiz), 2) Total
                         FROM [dbo].[Fact_Movimiento] FM
                         INNER JOIN Dim_ClaseMovimiento CM ON FM.idClaseMovimiento = CM.idClaseMovimiento
                         INNER JOIN Dim_Tiempo T ON T.idFecha = FM.idFecha
@@ -238,6 +284,141 @@ namespace AppFinanzasWeb.Servicios
                         ";
 
             return await connection.QueryAsync<int>(sql);
+        }
+
+        public async Task<IEnumerable<MovimientoClaseTotalViewModel>> ObtenerIngresosPorClasePesos(int year, int month)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var sql = @"SELECT 
+	                        CM.descripcion ClaseMovimiento
+	                        , ROUND(SUM(TOTALPESOS), 2) Total
+                        FROM
+                        (
+                        SELECT 
+	                        FM.*
+	                        ,
+		                        CASE WHEN A.SIMBOLO = 'ARS' 
+		                        THEN FM.MONTO 
+		                        ELSE (FM.MONTO / FM.PRECIOCOTIZ) 
+		                        * (SELECT VALOR FROM Cotizacion_Activo WHERE IDFECHA = 
+			                        (SELECT MAX(IDFECHA) FROM Cotizacion_Activo
+			                        ) 
+		                        AND idActivoComp = 1 AND TIPO = 'BLUE')
+		                         END TOTALPESOS
+                        FROM [dbo].[Fact_Movimiento] FM
+                        INNER JOIN [dbo].[Dim_Activo] A ON A.idActivo = FM.idActivo
+                        INNER JOIN Dim_Tiempo T ON T.idFecha = FM.idFecha
+                        WHERE FM.tipoMovimiento = 'Ingreso' AND  T.anio = @Year AND T.mes = @Month
+                        ) T1
+                        INNER JOIN [dbo].[Dim_ClaseMovimiento] CM ON CM.idClaseMovimiento = T1.idClaseMovimiento
+                        GROUP BY CM.descripcion
+                        ORDER BY SUM(TOTALPESOS) DESC
+                        ";
+
+            return await connection.QueryAsync<MovimientoClaseTotalViewModel>(sql, new { year, month });
+        }
+
+        public async Task<IEnumerable<MovimientoClaseTotalViewModel>> ObtenerEgresosPorClasePesos(int year, int month)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var sql = @"SELECT 
+	                        CM.descripcion ClaseMovimiento
+	                        , ROUND(- SUM(TOTALPESOS), 2) Total
+                        FROM
+                        (
+                        SELECT 
+	                        FM.*
+	                        ,
+		                        CASE WHEN A.SIMBOLO = 'ARS' 
+		                        THEN FM.MONTO 
+		                        ELSE (FM.MONTO / FM.PRECIOCOTIZ) 
+		                        * (SELECT VALOR FROM Cotizacion_Activo WHERE IDFECHA = 
+			                        (SELECT MAX(IDFECHA) FROM Cotizacion_Activo
+			                        ) 
+		                        AND idActivoComp = 1 AND TIPO = 'BLUE')
+		                         END TOTALPESOS
+                        FROM [dbo].[Fact_Movimiento] FM
+                        INNER JOIN [dbo].[Dim_Activo] A ON A.idActivo = FM.idActivo
+                        INNER JOIN Dim_Tiempo T ON T.idFecha = FM.idFecha
+                        WHERE FM.tipoMovimiento = 'Egreso' AND  T.anio = @Year AND T.mes = @Month
+                        ) T1
+                        INNER JOIN [dbo].[Dim_ClaseMovimiento] CM ON CM.idClaseMovimiento = T1.idClaseMovimiento
+                        GROUP BY CM.descripcion
+                        ORDER BY - SUM(TOTALPESOS) DESC
+                        ";
+
+            return await connection.QueryAsync<MovimientoClaseTotalViewModel>(sql, new { year, month });
+        }
+
+        public async Task<IEnumerable<MovimientoUlt6MesesViewModel>> ObtenerIngresosUltMesesPesos()
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var sql = @"WITH ULTIMOSMESES AS (
+                        SELECT TOP 6
+	                        T.anio, T.mes, T.mesNombre, ROUND(SUM(S1.VALORPESOS), 2) Total
+                        FROM
+                        (
+                        SELECT 
+	                        FM.*, 
+	                        CASE WHEN FM.idActivo = 2 THEN 1 ELSE CA.VALOR END COTIZACTUAL, 
+	                        CASE WHEN FM.idActivo = 2 THEN FM.MONTO ELSE FM.MONTO/CA.valor END VALORUSD, 
+	                        (
+		                        SELECT VALOR FROM Cotizacion_Activo WHERE IDFECHA = 
+			                        (SELECT MAX(IDFECHA) FROM Cotizacion_Activo
+			                        ) 
+		                        AND idActivoComp = 1 AND TIPO = 'BLUE'
+	                        ) * (CASE WHEN FM.idActivo = 2 THEN FM.MONTO ELSE FM.MONTO/CA.valor END) VALORPESOS
+                        FROM [dbo].[Fact_Movimiento] FM
+                        LEFT JOIN [dbo].[Cotizacion_Activo] CA ON FM.idActivo = CA.idActivoComp AND 
+	                        CA.idFecha = (SELECT MAX(IDFECHA) FROM Cotizacion_Activo) AND CA.tipo IN('NA', 'BLUE')
+                        WHERE FM.tipoMovimiento = 'Ingreso' AND FM.idClaseMovimiento IS NOT NULL
+                        ) S1
+                        INNER JOIN Dim_Tiempo T ON S1.idFecha = T.idFecha
+                        GROUP BY T.anio, T.mes, T.mesNombre
+                        order by t.anio DESC, T.mes DESC)
+                        SELECT * 
+                        FROM ULTIMOSMESES
+                        ORDER BY ANIO ASC, MES ASC;
+                        ";
+
+            return await connection.QueryAsync<MovimientoUlt6MesesViewModel>(sql);
+        }
+        public async Task<IEnumerable<MovimientoUlt6MesesViewModel>> ObtenerEgresosUltMesesPesos()
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var sql = @"WITH ULTIMOSMESES AS (
+                        SELECT TOP 6
+	                        T.anio, T.mes, T.mesNombre, ROUND(- SUM(S1.VALORPESOS), 2) Total
+                        FROM
+                        (
+                        SELECT 
+	                        FM.*, 
+	                        CASE WHEN FM.idActivo = 2 THEN 1 ELSE CA.VALOR END COTIZACTUAL, 
+	                        CASE WHEN FM.idActivo = 2 THEN FM.MONTO ELSE FM.MONTO/CA.valor END VALORUSD, 
+	                        (
+		                        SELECT VALOR FROM Cotizacion_Activo WHERE IDFECHA = 
+			                        (SELECT MAX(IDFECHA) FROM Cotizacion_Activo
+			                        ) 
+		                        AND idActivoComp = 1 AND TIPO = 'BLUE'
+	                        ) * (CASE WHEN FM.idActivo = 2 THEN FM.MONTO ELSE FM.MONTO/CA.valor END) VALORPESOS
+                        FROM [dbo].[Fact_Movimiento] FM
+                        LEFT JOIN [dbo].[Cotizacion_Activo] CA ON FM.idActivo = CA.idActivoComp AND 
+	                        CA.idFecha = (SELECT MAX(IDFECHA) FROM Cotizacion_Activo) AND CA.tipo IN('NA', 'BLUE')
+                        WHERE FM.tipoMovimiento = 'Egreso' AND FM.idClaseMovimiento IS NOT NULL
+                        ) S1
+                        INNER JOIN Dim_Tiempo T ON S1.idFecha = T.idFecha
+                        GROUP BY T.anio, T.mes, T.mesNombre
+                        order by t.anio DESC, T.mes DESC)
+                        SELECT * 
+                        FROM ULTIMOSMESES
+                        ORDER BY ANIO ASC, MES ASC;
+                        ";
+
+            return await connection.QueryAsync<MovimientoUlt6MesesViewModel>(sql);
         }
     }
 }
