@@ -130,31 +130,43 @@ namespace AppFinanzasWeb.Controllers
 
             if (recurrenteVM.Accion == "Cerrar")
             {
-                await repositorioMovTarjetas.CerrarRecurente(movOriginal.IdMovimiento);
+                DateTime mesCierreDate = new DateTime(recurrenteVM.FechaNueva.Value.Year, recurrenteVM.FechaNueva.Value.Month, 1);
+                var mesCierre = int.Parse(mesCierreDate.ToString("yyyyMMdd"));
+
+                await repositorioMovTarjetas.CerrarRecurente(movOriginal.IdMovimiento, mesCierre);
                 TempData["SuccessMessage"] = "Movimiento cerrado con éxito.";
             }
             else
             {
                 DateTime mesPrimerCuota = new DateTime(recurrenteVM.FechaNueva.Value.Year, recurrenteVM.FechaNueva.Value.Month, 1);
 
-                MovTarjeta movNuevo = new MovTarjeta
+                if (mesPrimerCuota == movOriginal.MesPrimerCuota)
                 {
-                    IdFecha = int.Parse(recurrenteVM.FechaNueva.Value.ToString("yyyyMMdd")),
-                    Detalle = recurrenteVM.MovTarjeta.Detalle,
-                    IdTarjeta = recurrenteVM.MovTarjeta.IdTarjeta,
-                    IdClaseMovimiento = recurrenteVM.MovTarjeta.IdClaseMovimiento,
-                    IdActivo = recurrenteVM.MovTarjeta.IdActivo,
-                    MontoTotal = Convert.ToDecimal(recurrenteVM.MontoNuevoString),
-                    Cuotas = 1,
-                    IdMesPrimerCuota = int.Parse(mesPrimerCuota.ToString("yyyyMMdd")),
-                    IdMesUltimaCuota = 0,
-                    Repite = "SI",
-                    MontoCuota = Convert.ToDecimal(recurrenteVM.MontoNuevoString)
-                };
+                    await repositorioMovTarjetas.ActualizarRecurente(movOriginal.IdMovimiento, Convert.ToDecimal(recurrenteVM.MontoNuevoString));
+                }
+                else
+                {
+                    MovTarjeta movNuevo = new MovTarjeta
+                    {
+                        IdFecha = int.Parse(recurrenteVM.FechaNueva.Value.ToString("yyyyMMdd")),
+                        Detalle = recurrenteVM.MovTarjeta.Detalle,
+                        IdTarjeta = recurrenteVM.MovTarjeta.IdTarjeta,
+                        IdClaseMovimiento = recurrenteVM.MovTarjeta.IdClaseMovimiento,
+                        IdActivo = recurrenteVM.MovTarjeta.IdActivo,
+                        MontoTotal = Convert.ToDecimal(recurrenteVM.MontoNuevoString),
+                        Cuotas = 1,
+                        IdMesPrimerCuota = int.Parse(mesPrimerCuota.ToString("yyyyMMdd")),
+                        IdMesUltimaCuota = 0,
+                        Repite = "SI",
+                        MontoCuota = Convert.ToDecimal(recurrenteVM.MontoNuevoString)
+                    };
 
+                    var mesCierre = int.Parse(mesPrimerCuota.AddMonths(-1).ToString("yyyyMMdd"));
 
-                await repositorioMovTarjetas.InsertarMovimiento(movNuevo);
-                await repositorioMovTarjetas.CerrarRecurente(movOriginal.IdMovimiento);
+                    await repositorioMovTarjetas.InsertarMovimiento(movNuevo);
+                    await repositorioMovTarjetas.CerrarRecurente(movOriginal.IdMovimiento, mesCierre);
+                }
+                
                 TempData["SuccessMessage"] = "Movimiento actualizado con éxito.";
             }
 

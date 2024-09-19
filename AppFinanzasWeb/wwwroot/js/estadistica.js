@@ -705,4 +705,55 @@ function updateGraficosDB3(data) {
             }
         }
     });
+
+    var tableGastosMes = document.getElementById('tablaGastos');
+    tableGastosMes.innerHTML = '';
+
+    var tableTotal = '';
+    var baseTable = '<div class="card"> ' +
+        '<div class="card-header"> ' +
+        '<h5>Gastos en el mes Actual </h5>' +
+        '   </div>' +
+        '<div class="card-body"> ' +
+        '<div class="table-responsive">' +
+        '   <table class="table table-bordered table-hover">' +
+        '    <thead>' +
+        '   <tr>' +
+        '   <th>Tarjeta </th>' +
+        ' <th> Moneda </th>' +
+        '   <th>Fecha </th>' +
+        '  <th> Tipo Movimiento </th>' +
+        '   <th> Detalle </th>' +
+        ' <th> Cuota </th>' +
+        ' <th> Monto Cuota </th>' +
+        ' <th> Valor Pesos </th>' +
+        '   </tr>' +
+        '  </thead>' +
+        '<tbody id="gastosTableBody" >';
+
+    tableTotal = baseTable;
+
+    $.each(data.gastosTarjetaMes, function (i, movimiento) {
+        var row = '<tr>' +
+            '<td>' + movimiento.nombreTarj + '</td>' +
+            '<td>' + movimiento.nombreMoneda + '</td>' +
+            '<td>' + movimiento.fechaMov.toString("yyyy-MM-dd") + '</td>' +
+            '<td>' + movimiento.tipoMov + '</td>' +
+            '<td>' + movimiento.detalle + '</td>' +
+            '<td>' + movimiento.cuotaTexto + '</td>' +
+            '<td>' + movimiento.montoCuota + '</td>' +
+            '<td>' + movimiento.valorPesos + '</td>' +
+            '</tr>';
+        tableTotal = tableTotal + row;
+    });
+    baseTable = '</tbody>' +
+        '</table>' +
+        '</div>' +
+        '</div>' +
+        '</div>';
+
+    tableTotal = tableTotal + baseTable;
+
+
+    tableGastosMes.innerHTML = tableTotal ;
 }

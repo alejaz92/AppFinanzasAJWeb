@@ -7,14 +7,17 @@ namespace AppFinanzasWeb.Servicios
 {
     public interface IRepositorioMovTarjetas
     {
-        Task CerrarRecurente(int id);
+        Task ActualizarRecurente(int id, decimal monto);
+        Task CerrarRecurente(int id, int mesCierre);
         Task InsertarMovimiento(MovTarjeta movTarjeta);
         Task<IEnumerable<MovimientoUlt6MesesViewModel>> ObtenerEstadisticaTarjetaMeses(string Tarjeta, string Moneda);
         Task<IEnumerable<MovimientoUlt6MesesViewModel>> ObtenerEstadisticaTarjetaMesesTotal(string Moneda);
         Task<IEnumerable<MovTarjeta>> ObtenerMovimientosPaginacion(int pagina, int cantidadPorPagina);
         Task<IEnumerable<MovTarjeta>> ObtenerMovimientosPago(int IdTarjeta, string FechaPago);
+        Task<IEnumerable<MovTarjeta>> ObtenerMovimientosPagoTodas(string FechaPago);
         Task<MovTarjeta> ObtenerPorId(int id);
         Task<int> ObtenerTotalMovimientos();
+
     }
 
     public class RepositorioMovTarjetas : IRepositorioMovTarjetas
@@ -135,11 +138,18 @@ namespace AppFinanzasWeb.Servicios
             return await connection.QueryFirstOrDefaultAsync<MovTarjeta>(sql, new {id});
         }
 
-        public async Task CerrarRecurente(int id)
+        public async Task CerrarRecurente(int id, int mesCierre)
         {
             using var connection = new SqlConnection(connectionString);
 
-            await connection.ExecuteAsync("UPDATE Fact_Tarjetas SET repite = 'Cerrado' WHERE IdMovimiento = @Id", new { id });
+            await connection.ExecuteAsync("UPDATE Fact_Tarjetas SET repite = 'Cerrado', mesUltimaCuota = @MesCierre WHERE IdMovimiento = @Id", new { id, mesCierre });
+        }
+
+        public async Task ActualizarRecurente(int id, decimal monto)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            await connection.ExecuteAsync("UPDATE Fact_Tarjetas SET montoTotal = @Monto, montoCuota = @Monto  WHERE IdMovimiento = @Id", new { id, monto });
         }
 
         public async Task<IEnumerable<MovTarjeta>> ObtenerMovimientosPago(int IdTarjeta, string FechaPago)
@@ -148,6 +158,7 @@ namespace AppFinanzasWeb.Servicios
 
             var sql = @"SELECT 
                             A.IdActivo IdActivo,
+                            TA.nombre NombreTarj,
 	                        T1.FECHA FechaMov,
                             CM.IdClaseMovimiento IdClaseMovimiento,
 	                        CM.descripcion TipoMov,
@@ -168,12 +179,49 @@ namespace AppFinanzasWeb.Servicios
                         INNER JOIN Dim_Tiempo T1 ON   T1.IDFECHA = T.FECHAMOV 
                         INNER JOIN Dim_Tiempo T2 ON T2.IDFECHA = T.MESPRIMERCUOTA 
                         INNER JOIN    Dim_Tiempo T3 ON T3.IDFECHA = T.MESULTIMACUOTA WHERE  (T3.FECHA >= @FechaPago OR T.repite = 'SI') AND 
-	                        T2.FECHA <= @FechaPago AND  TA.IdTarjeta = @IdTarjeta AND PT.idTarjeta IS NULL;";
+	                        T2.FECHA <= @FechaPago AND  TA.IdTarjeta = @IdTarjeta AND PT.idTarjeta IS NULL ORDER BY NombreMoneda, fechaMov;";
 
 
             return await connection.QueryAsync<MovTarjeta>(sql, new
             {
                 IdTarjeta = IdTarjeta,
+                FechaPago = FechaPago
+            });
+
+        }
+
+        public async Task<IEnumerable<MovTarjeta>> ObtenerMovimientosPagoTodas(string FechaPago)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var sql = @"SELECT 
+                            A.IdActivo IdActivo,
+                            TA.nombre NombreTarj,
+	                        T1.FECHA FechaMov,
+                            CM.IdClaseMovimiento IdClaseMovimiento,
+	                        CM.descripcion TipoMov,
+	                        T.detalle Detalle, 
+	                        A.nombre NombreMoneda,
+	                        CASE WHEN T.repite = 'SI' THEN 'Recurrente' ELSE CAST(DATEDIFF(MONTH, T2.FECHA, @FechaPago) + 1 AS VARCHAR) 
+		                        + '/' + cast(T.cuotas as varchar) END CuotaTexto,
+	                        T.montoCuota MontoCuota, 
+	                        CAST(CASE WHEN A.NOMBRE = 'Peso Argentino' THEN T.montoCuota ELSE (T.montoCuota * CA.VALOR)  
+		                        END  AS DECIMAL (18, 2)) ValorPesos 
+                        FROM [dbo].[Fact_Tarjetas] T 
+                        INNER JOIN [dbo].[Dim_Activo] A ON T.idActivo = A.idActivo 
+                        INNER JOIN [dbo].[Cotizacion_Activo] CA ON CA.idActivoComp = (SELECT idActivo FROM Dim_Activo WHERE simbolo = 'ARS') AND 
+	                        CA. TIPO = 'TARJETA' AND CA.IDFECHA = (SELECT MAX(IDFECHA) FROM Cotizacion_Activo) 
+                        INNER JOIN Dim_ClaseMovimiento CM ON CM.idClaseMovimiento = T.idClaseMovimiento 
+                        INNER JOIN [dbo].[Dim_Tarjeta] TA ON T.idTarjeta = TA.idTarjeta  
+                        LEFT JOIN Pago_Tarjeta PT ON PT.idTarjeta = T.idTarjeta AND PT.fechaMes = REPLACE(@FechaPago, '-','') 
+                        INNER JOIN Dim_Tiempo T1 ON   T1.IDFECHA = T.FECHAMOV 
+                        INNER JOIN Dim_Tiempo T2 ON T2.IDFECHA = T.MESPRIMERCUOTA 
+                        INNER JOIN    Dim_Tiempo T3 ON T3.IDFECHA = T.MESULTIMACUOTA WHERE  (T3.FECHA >= @FechaPago OR T.repite = 'SI') AND 
+	                        T2.FECHA <= @FechaPago  AND PT.idTarjeta IS NULL ORDER BY NombreTarj,NombreMoneda, fechaMov;";
+
+
+            return await connection.QueryAsync<MovTarjeta>(sql, new
+            {
                 FechaPago = FechaPago
             });
 

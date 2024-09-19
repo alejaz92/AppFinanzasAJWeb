@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Globalization;
 using System;
 using AppFinanzasWeb.ViewModels.Estadistica;
+using AppFinanzasWeb.Models;
 
 namespace AppFinanzasWeb.Controllers
 {
@@ -74,24 +75,42 @@ namespace AppFinanzasWeb.Controllers
         {
             IEnumerable<MovimientoUlt6MesesViewModel> tarjetaPesos = null;
             IEnumerable<MovimientoUlt6MesesViewModel> tarjetaDolares = null;
+            IEnumerable<MovTarjeta> gastosTarjetaMes = null;
 
+            string mesActual = DateTime.Now.ToString("yyyy-MM") + "-01";
 
             if (selectedCard == "Total")
             {
                 tarjetaPesos = await repositorioMovTarjetas.ObtenerEstadisticaTarjetaMesesTotal( "Peso Argentino");
                 tarjetaDolares = await repositorioMovTarjetas.ObtenerEstadisticaTarjetaMesesTotal("Dolar Estadounidense");
+                gastosTarjetaMes = await repositorioMovTarjetas.ObtenerMovimientosPagoTodas (mesActual);
             }
             else
             {
                 tarjetaPesos = await repositorioMovTarjetas.ObtenerEstadisticaTarjetaMeses(selectedCard, "Peso Argentino");
                 tarjetaDolares = await repositorioMovTarjetas.ObtenerEstadisticaTarjetaMeses(selectedCard, "Dolar Estadounidense");
+                gastosTarjetaMes = await repositorioMovTarjetas.ObtenerMovimientosPago(int.Parse(selectedCard), mesActual);
             }
 
+            var gastosTarjetaTransformados = gastosTarjetaMes.Select(movimiento => new
+            {
+                FechaMov = movimiento.FechaMov.ToString("yyyy-MM-dd"),
+                NombreTarj = movimiento.NombreTarj,
+                tipoMov = movimiento.TipoMov,
+                detalle = movimiento.Detalle,
+                nombreMoneda = movimiento.NombreMoneda,
+                cuotaTexto = movimiento.CuotaTexto,
+                montoCuota = movimiento.MontoCuota.ToString("$ #,##0.00", new System.Globalization.CultureInfo("es-ES")),
+                valorPesos = movimiento.ValorPesos.ToString("$ #,##0.00", new System.Globalization.CultureInfo("es-ES")),
+                idActivo = movimiento.IdActivo,
+                idClaseMovimiento = movimiento.IdClaseMovimiento
+            });
 
             var result = new
             {
                 tarjetaPesos = tarjetaPesos,
-                tarjetaDolares = tarjetaDolares
+                tarjetaDolares = tarjetaDolares,
+                gastosTarjetaMes = gastosTarjetaTransformados
             };
             return Json(result);
         }
