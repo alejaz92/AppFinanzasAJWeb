@@ -11,6 +11,10 @@ var expenseLast6MonthsPesosChartInstance = null;
 var gastosEnPesosChartInstance = null;
 var gastosEnDolaresChartInstance = null;
 
+var porcentajeTickerChartInstance = null;
+var origVsActualChartInstance = null;
+var bolsaGralChartInstance = null;
+
 document.addEventListener("DOMContentLoaded", function () {
 
     cargarDatosDashboard1();
@@ -756,4 +760,269 @@ function updateGraficosDB3(data) {
 
 
     tableGastosMes.innerHTML = tableTotal ;
+}
+
+function cargarDatosDashboard4() {
+    var selectedTipoActivo = document.getElementById('idTipoActivo').value;
+    //console.log(JSON.stringify({ "selectedMonth": selectedMonth }));
+    fetch('/Estadistica/getDataDB4', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(selectedTipoActivo)
+    })
+        .then(response => response.json())
+        .then(data => {
+            updateGraficosDB4(data);
+        });
+}
+
+function updateGraficosDB4(data) {
+
+    //graph 1 porcentaje
+    if (porcentajeTickerChartInstance) {
+        porcentajeTickerChartInstance.destroy();
+    }
+
+    var porcentajeTickersChart = document.getElementById('porcentajeTickersChart').getContext('2d'); 
+    //console.log(data.porcentajeTicker)
+    var tickers = data.bolsaEstadistica1.map(ticker => ticker.nombreActivo);
+    var simbolos = data.bolsaEstadistica1.map(ticker => ticker.simbolo);
+    var valoresActuales = data.bolsaEstadistica1.map(ticker => ticker.valorActual);
+
+    // Generar colores controlados para evitar problemas de contraste
+    var coloresControlados = generarColoresControlados(valoresActuales.length);
+
+       porcentajeTickerChartInstance = new Chart(porcentajeTickersChart, {
+        type: 'pie',
+        data: {
+            labels: simbolos,
+            datasets: [{
+                data: valoresActuales,
+                backgroundColor: coloresControlados,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'right'
+                },
+                title: {
+                    display: true,
+                    text: 'Distribución por Ticker (En Dólares)'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (tooltipItem) {
+                            let total = tooltipItem.dataset.data.reduce((a, b) => a + b, 0);
+                            let percentage = (tooltipItem.raw / total * 100).toFixed(2);
+                            let nombreLargo = tickers[tooltipItem.dataIndex];  // Nombre largo del ticker
+                            let simbolo = simbolos[tooltipItem.dataIndex];  // Símbolo del ticker
+                            return `${nombreLargo} (${simbolo}): ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(tooltipItem.raw)} (${percentage}%)`;
+                        }
+                    }
+                },
+                datalabels: {
+                    display: true,
+                    color: 'white',
+                    align: 'center',
+                    anchor: 'center',
+                    font: {
+                        weight: 'bold'
+                    },
+                    formatter: function (value, context) {
+                        // Calcula el porcentaje de la porción
+                        let total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                        let porcentaje = (value / total * 100).toFixed(2);
+
+                        // Solo muestra la etiqueta si el porcentaje es mayor que 5%
+                        if (porcentaje > 5) {
+                            return context.chart.data.labels[context.dataIndex];  // Mostrar símbolo solo si la porción es mayor al 5%
+                        } else {
+                            return '';  // No muestra etiqueta si la porción es pequeña
+                        }
+                    }
+                }
+            }
+           },
+           plugins: [ChartDataLabels]  // Asegúrate de habilitar el plugin
+       });
+
+    //graph 2 orig vs actual
+    if (origVsActualChartInstance) {
+        origVsActualChartInstance.destroy();
+    }
+
+    var origVsActualChart = document.getElementById('origVsActualChart').getContext('2d');
+
+    origVsActualChartInstance = new Chart(origVsActualChart, {
+        type: 'bar',
+        data: {
+            labels: data.bolsaEstadistica1.map(item => item.simbolo),
+            datasets: [{
+                label: 'Valores Originales',
+                data: data.bolsaEstadistica1.map(item => item.valorOrigen),
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            },
+                {
+                    label: 'Valores Actuales',
+                    data: valoresActuales,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+        },
+        options: {
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Comparación Valor Original vs Valor Actual (En Dólares)'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function (value) {
+                            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+
+    //tabla bolsa
+    var tableBolsa = document.getElementById('tablaBolsa');
+    tableBolsa.innerHTML = '';
+
+    var tableTotal = '';
+    var baseTable = '<div class="card"> ' +
+        '<div class="card-header"> ' +
+        '<h5>Gastos en el mes Actual </h5>' +
+        '   </div>' +
+        '<div class="card-body"> ' +
+        '<div class="table-responsive">' +
+        '   <table class="table table-bordered table-hover">' +
+        '    <thead>' +
+        '   <tr>' +
+        '   <th>Ticker</th>' +
+        '   <th>Nombre</th>' +
+        ' <th> Cantidad</th>' +
+        '   <th>Valor Origen</th>' +
+        '  <th>Valor Actual</th>' +
+        '   </tr>' +
+        '  </thead>' +
+        '<tbody id="bolsaTableBody" >';
+
+    tableTotal = baseTable;
+
+    $.each(data.bolsaEstadistica1, function (i, ticker) {
+        var row = '<tr>' +
+            '<td>' + ticker.simbolo + '</td>' +
+            '<td>' + ticker.nombreActivo + '</td>' +
+            '<td>' + ticker.cantidad + '</td>' +
+            '<td>' + ticker.valorOrigen + '</td>' +
+            '<td>' + ticker.valorActual + '</td>' +
+            '</tr>';
+        tableTotal = tableTotal + row;
+    });
+    baseTable = '</tbody>' +
+        '</table>' +
+        '</div>' +
+        '</div>' +
+        '</div>';
+
+    tableTotal = tableTotal + baseTable;
+
+
+    tableBolsa.innerHTML = tableTotal;
+
+
+    //graph 4 bolsa gral
+    if (bolsaGralChartInstance) {
+        bolsaGralChartInstance.destroy();
+    }
+
+    var bolsaGralChart = document.getElementById('bolsaGralChart').getContext('2d');
+    //console.log(data.porcentajeTicker)
+    var tiposActivo = data.bolsaEstadistica2.map(ticker => ticker.tipoActivo);
+    var valoresActuales = data.bolsaEstadistica2.map(ticker => ticker.valorActual);
+
+    // Generar colores controlados para evitar problemas de contraste
+    var coloresControlados = generarColoresControlados(valoresActuales.length);
+
+    bolsaGralChartInstance = new Chart(bolsaGralChart, {
+        type: 'pie',
+        data: {
+            labels: tiposActivo,
+            datasets: [{
+                data: valoresActuales,
+                backgroundColor: coloresControlados,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'right'
+                },
+                title: {
+                    display: true,
+                    text: 'Distribución por Tipo de Activo Bolsa (En Dólares)'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (tooltipItem) {
+                            let total = tooltipItem.dataset.data.reduce((a, b) => a + b, 0);
+                            let percentage = (tooltipItem.raw / total * 100).toFixed(2);
+                            return `${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(tooltipItem.raw)} (${percentage}%)`;
+                        }
+                    }
+                },
+                datalabels: {
+                    display: true,
+                    color: 'white',
+                    align: 'center',
+                    anchor: 'center',
+                    font: {
+                        weight: 'bold'
+                    },
+                    formatter: function (value, context) {
+                        // Calcula el porcentaje de la porción
+                        let total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                        let porcentaje = (value / total * 100).toFixed(2);
+
+                        // Solo muestra la etiqueta si el porcentaje es mayor que 5%
+                        if (porcentaje > 5) {
+                            return context.chart.data.labels[context.dataIndex];  // Mostrar símbolo solo si la porción es mayor al 5%
+                        } else {
+                            return '';  // No muestra etiqueta si la porción es pequeña
+                        }
+                    }
+                }
+            }
+        },
+        plugins: [ChartDataLabels]  // Asegúrate de habilitar el plugin
+    });
+}
+
+function generarColoresControlados(cantidad) {
+    var colores = [];
+    for (var i = 0; i < cantidad; i++) {
+        var hue = Math.floor(Math.random() * 360);  // Varía el tono entre 0 y 360 grados (todos los colores)
+        var saturation = Math.floor(Math.random() * (100 - 60) + 60);  // Saturación alta (60% a 100%) para colores vivos
+        var lightness = Math.floor(Math.random() * (70 - 40) + 40);  // Evita colores muy oscuros o muy claros (40% a 70%)
+
+        var color = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        colores.push(color);
+    }
+    return colores;
 }

@@ -31,6 +31,8 @@ namespace AppFinanzasWeb.Servicios
         Task<IEnumerable<MovimientoClaseTotalViewModel>> ObtenerEgresosPorClasePesos(int year, int month);
         Task<IEnumerable<MovimientoUlt6MesesViewModel>> ObtenerIngresosUltMesesPesos();
         Task<IEnumerable<MovimientoUlt6MesesViewModel>> ObtenerEgresosUltMesesPesos();
+        Task<IEnumerable<bolsaEstadisticaViewModel>> ObtenerBolsaEstadistica(int idTipoActivo);
+        Task<IEnumerable<bolsaGralEstadisticaViewModel>> ObtenerBolsaEstadisticaGral();
     }
 
     public class RepositorioMovimientos : IRepositorioMovimientos
@@ -419,6 +421,46 @@ namespace AppFinanzasWeb.Servicios
                         ";
 
             return await connection.QueryAsync<MovimientoUlt6MesesViewModel>(sql);
+        }
+
+        public async Task<IEnumerable<bolsaEstadisticaViewModel>> ObtenerBolsaEstadistica(int idTipoActivo)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var sql = @"SELECT 
+	                    A.nombre NombreActivo
+	                    , A.simbolo Simbolo
+                        , SUM(FM.monto) Cantidad
+	                    , ROUND(SUM(FM.MONTO / FM.PRECIOCOTIZ),2) ValorOrigen
+	                    ,ROUND(SUM(CASE WHEN FM.idActivo = 2 THEN FM.MONTO ELSE FM.MONTO/CA.valor END), 2) ValorActual
+                    FROM [dbo].[Fact_Movimiento] FM
+                    INNER JOIN [dbo].[Dim_Activo] A ON A.idActivo = FM.idActivo
+                    LEFT JOIN [dbo].[Cotizacion_Activo] CA ON FM.idActivo = CA.idActivoComp AND 
+	                    CA.idFecha = (SELECT MAX(IDFECHA) FROM Cotizacion_Activo) AND CA.tipo IN('NA', 'BLUE')
+                    WHERE A.idTipoActivo = @IdTipoActivo
+                    GROUP BY A.nombre, A.simbolo
+                    ORDER BY SUM(CASE WHEN FM.idActivo = 2 THEN FM.MONTO ELSE FM.MONTO/CA.valor END) DESC";
+
+            return await connection.QueryAsync<bolsaEstadisticaViewModel>(sql, new { idTipoActivo });
+        }
+        public async Task<IEnumerable<bolsaGralEstadisticaViewModel>> ObtenerBolsaEstadisticaGral()
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            var sql = @"SELECT 
+	                        TA.nombre TipoActivo
+	                        , ROUND(SUM(FM.MONTO / FM.PRECIOCOTIZ),2) ValorOrigen
+	                        ,ROUND(SUM(CASE WHEN FM.idActivo = 2 THEN FM.MONTO ELSE FM.MONTO/CA.valor END), 2) ValorActual
+                        FROM [dbo].[Fact_Movimiento] FM
+                        INNER JOIN [dbo].[Dim_Activo] A ON A.idActivo = FM.idActivo
+                        INNER JOIN [dbo].[Dim_Tipo_Activo] TA ON TA.idTipoActivo = A.idTipoActivo
+                        LEFT JOIN [dbo].[Cotizacion_Activo] CA ON FM.idActivo = CA.idActivoComp AND 
+	                        CA.idFecha = (SELECT MAX(IDFECHA) FROM Cotizacion_Activo) AND CA.tipo IN('NA', 'BLUE')
+                        WHERE TA.entorno = 'Bolsa'
+                        GROUP BY TA.nombre
+                        ORDER BY SUM(CASE WHEN FM.idActivo = 2 THEN FM.MONTO ELSE FM.MONTO/CA.valor END) DESC";
+
+            return await connection.QueryAsync<bolsaGralEstadisticaViewModel>(sql);
         }
     }
 }

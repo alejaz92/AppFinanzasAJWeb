@@ -13,18 +13,22 @@ namespace AppFinanzasWeb.Controllers
         private readonly IRepositorioMovimientos repositorioMovimientos;
         private readonly IRepositorioTarjetas repositorioTarjetas;
         private readonly IRepositorioMovTarjetas repositorioMovTarjetas;
+        private readonly IRepositorioTiposActivo repositorioTiposActivo;
 
-        public EstadisticaController(IRepositorioMovimientos repositorioMovimientos, IRepositorioTarjetas repositorioTarjetas, IRepositorioMovTarjetas repositorioMovTarjetas)
+        public EstadisticaController(IRepositorioMovimientos repositorioMovimientos, IRepositorioTarjetas repositorioTarjetas, 
+            IRepositorioMovTarjetas repositorioMovTarjetas, IRepositorioTiposActivo repositorioTiposActivo)
         {
             this.repositorioMovimientos = repositorioMovimientos;
             this.repositorioTarjetas = repositorioTarjetas;
             this.repositorioMovTarjetas = repositorioMovTarjetas;
+            this.repositorioTiposActivo = repositorioTiposActivo;
         }
         public async Task<IActionResult> Index()
         {
 
             ViewBag.MesActual = DateTime.Now.ToString("yyyy-MM"); // Formato 'YYYY-MM' requerido por el input de tipo 'month'.
             ViewBag.Tarjetas = await repositorioTarjetas.Obtener();
+            ViewBag.TiposActivo = await repositorioTiposActivo.ObtenerBolsa();
             return View();
         }
 
@@ -73,6 +77,17 @@ namespace AppFinanzasWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> getDataDB3([FromBody] string selectedCard)
         {
+            if (selectedCard != "Total")
+            {
+                Tarjeta tarjeta = await repositorioTarjetas.ObtenerPorId(int.Parse(selectedCard));
+
+                if (tarjeta is null)
+                {
+                    return RedirectToAction("NoEncontrado", "Home");
+                }
+
+            }
+
             IEnumerable<MovimientoUlt6MesesViewModel> tarjetaPesos = null;
             IEnumerable<MovimientoUlt6MesesViewModel> tarjetaDolares = null;
             IEnumerable<MovTarjeta> gastosTarjetaMes = null;
@@ -111,6 +126,28 @@ namespace AppFinanzasWeb.Controllers
                 tarjetaPesos = tarjetaPesos,
                 tarjetaDolares = tarjetaDolares,
                 gastosTarjetaMes = gastosTarjetaTransformados
+            };
+            return Json(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> getDataDB4([FromBody] int selectedTipoActivo)
+        {
+            TipoActivo tipoActivo = await repositorioTiposActivo.ObtenerPorId(selectedTipoActivo);
+
+            if (tipoActivo is null)
+            {
+                return RedirectToAction("NoEncontrado", "Home");
+            }
+
+            var bolsaEstadistica1 = await repositorioMovimientos.ObtenerBolsaEstadistica(selectedTipoActivo);
+            var bolsaEstadistica2 = await repositorioMovimientos.ObtenerBolsaEstadisticaGral();
+
+
+            var result = new
+            {
+                bolsaEstadistica1 = bolsaEstadistica1,
+                bolsaEstadistica2 = bolsaEstadistica2
             };
             return Json(result);
         }

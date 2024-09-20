@@ -18,6 +18,9 @@
         <li class="nav-item" role="presentation">
             <a class="nav-link" id="tarjetas-tab" data-bs-toggle="tab" href="#tarjetas" role="tab" aria-controls="tarjetas" aria-selected="false">Tarjetas</a>
         </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="bolsa-tab" data-bs-toggle="tab" href="#bolsa" role="tab" aria-controls="bosa" aria-selected="false">Bolsa</a>
+        </li>
     </ul>
 
     <!-- contenido de los tabs -->
@@ -124,6 +127,49 @@
                 </div>
             </div>
         </div>
+
+        <!-- tab bolsa-->
+
+        <div class="tab-pane fade show" id="bolsa" role="tabpanel" aria-labelledBy="bolsa-tab">
+            <div class="mt-3">
+                <h4>Inversiones en Bolsa</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="idTipoActivo">Tipo de Activo</label>
+                        <select class="form-control" onchange="cargarDatosDashboard4()" id="idTipoActivo">
+                            <option value="">Seleccione</option>
+                            @foreach (var tipoActivo in ViewBag.TiposActivo)
+                            {
+                                <option value="@tipoActivo.Id">@tipoActivo.Nombre</option>
+                            }
+                        </select>
+
+                    </div>
+
+                    <!-- Graficos -->
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <canvas id="bolsaGralChart"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <canvas id="porcentajeTickersChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <canvas id="origVsActualChart"></canvas>
+                        </div>
+                        <div class="col-md-6" id="tablaBolsa">
+                        </div>                        
+                    </div>
+@* 
+
+                    <div class="mt-4" id="tablaGastos">
+                    </div> *@
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -131,7 +177,8 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+@*     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script> *@
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <script src="~/js/estadistica.js" asp-append-version="true"></script>
 
     
