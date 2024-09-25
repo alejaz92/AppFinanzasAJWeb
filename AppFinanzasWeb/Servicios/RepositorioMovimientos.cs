@@ -211,6 +211,7 @@ namespace AppFinanzasWeb.Servicios
                         INNER JOIN Dim_ClaseMovimiento CM ON FM.idClaseMovimiento = CM.idClaseMovimiento
                         INNER JOIN Dim_Tiempo T ON T.idFecha = FM.idFecha
                         WHERE FM.tipoMovimiento = 'Ingreso' AND  T.anio = @Year AND T.mes = @Month
+                        AND CM.descripcion <> 'Ajuste Saldos Ingreso'
                         GROUP BY CM.descripcion
                         ORDER BY SUM(FM.monto / FM.precioCotiz) DESC";
 
@@ -228,6 +229,7 @@ namespace AppFinanzasWeb.Servicios
                         INNER JOIN Dim_ClaseMovimiento CM ON FM.idClaseMovimiento = CM.idClaseMovimiento
                         INNER JOIN Dim_Tiempo T ON T.idFecha = FM.idFecha
                         WHERE FM.tipoMovimiento = 'Ingreso' 
+                        AND CM.descripcion <> 'Ajuste Saldos Ingreso'
                         GROUP BY T.ANIO, T.mes, T.mesNombre
                         ORDER BY T.ANIO, T.mes DESC)
                         SELECT * 
@@ -248,6 +250,7 @@ namespace AppFinanzasWeb.Servicios
                         INNER JOIN Dim_ClaseMovimiento CM ON FM.idClaseMovimiento = CM.idClaseMovimiento
                         INNER JOIN Dim_Tiempo T ON T.idFecha = FM.idFecha
                         WHERE FM.tipoMovimiento = 'Egreso' 
+                        AND CM.descripcion <> 'Ajuste Saldos Egreso'
                         GROUP BY T.ANIO, T.mes, T.mesNombre
                         ORDER BY T.ANIO, T.mes DESC)
                         SELECT * 
@@ -268,6 +271,7 @@ namespace AppFinanzasWeb.Servicios
                         INNER JOIN Dim_ClaseMovimiento CM ON FM.idClaseMovimiento = CM.idClaseMovimiento
                         INNER JOIN Dim_Tiempo T ON T.idFecha = FM.idFecha
                         WHERE FM.tipoMovimiento = 'Egreso' AND  T.anio = @Year AND T.mes = @Month
+                        AND CM.descripcion <> 'Ajuste Saldos Egreso'
                         GROUP BY CM.descripcion
                         ORDER BY - SUM(FM.monto / FM.precioCotiz) DESC";
 
