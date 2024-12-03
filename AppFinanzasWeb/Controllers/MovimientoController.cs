@@ -705,8 +705,17 @@ namespace AppFinanzasWeb.Controllers
             {
                 tipoActivoIng = null;
             }
-
-            CotizacionActivo cotizacionIng = await repositorioCotizacionesActivos.GetUltimaCotizPorMoneda((int)viewModel.IdActivoIng, tipoActivoIng);
+            decimal cotizacionIngVal;
+            if (activoIng.ActivoNombre != "Dolar Estadounidense")
+            {
+                CotizacionActivo cotizacionIng = await repositorioCotizacionesActivos.GetUltimaCotizPorMoneda((int)viewModel.IdActivoIng, tipoActivoIng);
+                cotizacionIngVal = Convert.ToDecimal(cotizacionIng.Valor);
+            }
+            else
+            {
+                cotizacionIngVal = 1;
+            }
+           
 
             string tipoActivoEgr;
             if (activoEgr.ActivoNombre == "Peso Argentino")
@@ -717,8 +726,18 @@ namespace AppFinanzasWeb.Controllers
             {
                 tipoActivoEgr = null;
             }
+            decimal cotizacionEgrVal;
 
-            CotizacionActivo cotizacionEgr = await repositorioCotizacionesActivos.GetUltimaCotizPorMoneda((int)viewModel.IdActivoEgr, tipoActivoEgr);
+            if ( activoEgr.ActivoNombre != "Dolar Estadounidense")
+            {
+                CotizacionActivo cotizacionEgr = await repositorioCotizacionesActivos.GetUltimaCotizPorMoneda((int)viewModel.IdActivoEgr, tipoActivoEgr);
+                cotizacionEgrVal = Convert.ToDecimal(cotizacionEgr.Valor);
+            } 
+            else
+            {
+                cotizacionEgrVal = 1;
+            }
+            
 
             var idMovimiento = await repositorioMovimientos.ObtenerIdMaximo() + 1;
 
@@ -733,7 +752,7 @@ namespace AppFinanzasWeb.Controllers
                 Comentario = "Intercambio Monedas (Egreso)",
                 Monto = -(decimal)viewModel.CantidadEgr,
                 Fecha = viewModel.Fecha,
-                PrecioCotiz = Convert.ToDecimal(cotizacionEgr.Valor),
+                PrecioCotiz = cotizacionEgrVal,
                 ActivoNombre = activoEgr.ActivoNombre
             };
 
@@ -749,7 +768,7 @@ namespace AppFinanzasWeb.Controllers
                 Comentario = "Intercambio Monedas (Ingreso)",
                 Monto = (decimal)viewModel.CantidadIng,
                 Fecha = viewModel.Fecha,
-                PrecioCotiz = Convert.ToDecimal(cotizacionIng.Valor),
+                PrecioCotiz = cotizacionIngVal,
                 ActivoNombre = activoIng.ActivoNombre
             };
 
